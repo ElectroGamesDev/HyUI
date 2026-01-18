@@ -140,6 +140,29 @@ public abstract class HyUInterface implements UIContext {
         }
     }
 
+    public Optional<UIElementBuilder<?>> getById(String id) {
+        for (UIElementBuilder<?> element : elements) {
+            Optional<UIElementBuilder<?>> found = findByIdRecursive(element, id);
+            if (found.isPresent()) return found;
+        }
+        return Optional.empty();
+    }
+
+    private Optional<UIElementBuilder<?>> findByIdRecursive(UIElementBuilder<?> element, String id) {
+        if (id.equals(element.getId())) {
+            return Optional.of(element);
+        }
+        for (UIElementBuilder<?> child : element.children) {
+            Optional<UIElementBuilder<?>> found = findByIdRecursive(child, id);
+            if (found.isPresent()) return found;
+        }
+        return Optional.empty();
+    }
+
+    public <E extends UIElementBuilder<E>> Optional<E> getById(String id, Class<E> clazz) {
+        return getById(id).filter(clazz::isInstance).map(clazz::cast);
+    }
+
     public String getUiFile() {
         return uiFile;
     }

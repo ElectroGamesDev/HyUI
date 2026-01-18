@@ -2,6 +2,7 @@ package au.ellie.hyui.commands;
 
 import au.ellie.hyui.builders.HudBuilder;
 import au.ellie.hyui.builders.HyUIHud;
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.GameMode;
@@ -55,16 +56,21 @@ public class HyUIAddHudCommand extends AbstractAsyncCommand {
     private void addHud(PlayerRef playerRef, Store<EntityStore> store) {
         String html = """
             <div id="Test" style="anchor-width: 280; anchor-height: 240; anchor-right: 1; anchor-top: 150">
-                <div style="background-color: #000000">
+                <div style="background-color: #000000; layout-mode: top">
                     <label>
                         HUD Instance #""" + (HUD_INSTANCES.size() + 1) + """
-                </label>
+                    </label>
+                    <label id="Hello">Initial Text</label>
                 </div>
             </div>
             """;
         
         HyUIHud hud = HudBuilder.detachedHud()
                 .fromHtml(html)
+                .withRefreshRate(1000)
+                .onRefresh((h) -> {
+                    //playerRef.sendMessage(Message.raw("HUD Refreshed!"));
+                })
                 .show(playerRef, store);
         
         HUD_INSTANCES.add(hud);

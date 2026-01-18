@@ -13,9 +13,12 @@ import javax.annotation.Nonnull;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.function.Consumer;
 
 public class HudBuilder extends InterfaceBuilder<HudBuilder> {
     private final PlayerRef playerRef;
+    private long refreshRateMs = 0;
+    private Consumer<HyUIHud> refreshListener;
 
     public HudBuilder(PlayerRef playerRef) {
         this.playerRef = playerRef;
@@ -25,6 +28,29 @@ public class HudBuilder extends InterfaceBuilder<HudBuilder> {
     public HudBuilder() {
         this.playerRef = null;
         fromFile("Pages/EllieAU_HyUI_Placeholder.ui");
+    }
+
+    /**
+     * Sets the refresh rate for the HUD in milliseconds.
+     * If set to 0 (default), the HUD will not refresh periodically.
+     *
+     * @param ms The refresh rate in milliseconds.
+     * @return The HudBuilder instance.
+     */
+    public HudBuilder withRefreshRate(long ms) {
+        this.refreshRateMs = ms;
+        return this;
+    }
+
+    /**
+     * Registers a callback to be triggered when the HUD is refreshed.
+     *
+     * @param listener The listener callback.
+     * @return The HudBuilder instance.
+     */
+    public HudBuilder onRefresh(Consumer<HyUIHud> listener) {
+        this.refreshListener = listener;
+        return this;
     }
 
     /**
@@ -82,6 +108,8 @@ public class HudBuilder extends InterfaceBuilder<HudBuilder> {
      */
     public HyUIHud addTo(@Nonnull PlayerRef playerRefParam, @Nonnull HyUIMultiHud multiHud, String name) {
         var hyUIHud = new HyUIHud(playerRefParam, uiFile, getTopLevelElements(), editCallbacks);
+        hyUIHud.setRefreshRateMs(refreshRateMs);
+        hyUIHud.setRefreshListener(refreshListener);
         HyUIPlugin.getLog().logInfo("Adding to a MultiHud: " + name);
         
         // Set HUD itself will redraw the parent and itself by proxy.
