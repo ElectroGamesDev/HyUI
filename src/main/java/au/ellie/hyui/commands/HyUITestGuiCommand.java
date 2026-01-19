@@ -23,7 +23,7 @@ import static com.hypixel.hytale.server.core.command.commands.player.inventory.I
 public class HyUITestGuiCommand extends AbstractAsyncCommand {
 
     public HyUITestGuiCommand() {
-        super("test", "Opens the HyUI Test GUI");
+        super("t", "Opens the HyUI Test GUI");
         this.setPermissionGroup(GameMode.Adventure);
     }
 
@@ -61,7 +61,7 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
             <style>
                 .page-overlay {
                     anchor: 150;
-                    background-color: #000000(0.5);
+                    background-image: url('lizard.png');
                 }
                 .container 
                 { 

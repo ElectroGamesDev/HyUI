@@ -220,10 +220,30 @@ public interface TagHandler {
                         }
                     } catch (NumberFormatException ignored) {}
                     break;
+                case "background-image":
+                    if (builder instanceof BackgroundSupported) {
+                        String realUrl = value.replace("url(", "")
+                                .replace(")", "")
+                                .replace("\"", "")
+                                .replace("'", "");
+                        HyUIPatchStyle background = ((BackgroundSupported<?>) builder).getBackground();
+                        if (background == null) {
+                            HyUIPatchStyle bg = new HyUIPatchStyle().setTexturePath(realUrl);
+                            ((BackgroundSupported<?>) builder).withBackground(bg);
+                        } else {
+                            background.setTexturePath(realUrl);
+                        }
+                    }
+                    break;
                 case "background-color":
                     if (builder instanceof BackgroundSupported) {
-                        HyUIPatchStyle bg = new HyUIPatchStyle().setColor(value);
-                        ((BackgroundSupported<?>) builder).withBackground(bg);
+                        HyUIPatchStyle background = ((BackgroundSupported<?>) builder).getBackground();
+                        if (background == null) {
+                            HyUIPatchStyle bg = new HyUIPatchStyle().setColor(value);
+                            ((BackgroundSupported<?>) builder).withBackground(bg);
+                        } else {
+                            background.setColor(value);
+                        }
                     }
                     break;
             }

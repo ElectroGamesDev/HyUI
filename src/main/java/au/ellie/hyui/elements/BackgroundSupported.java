@@ -44,7 +44,6 @@ public interface BackgroundSupported<T extends BackgroundSupported<T>> {
                 // Already handled inline
                 return;
             }
-
             commands.setObject(selector + ".Background", background.getHytalePatchStyle());
         }
     }
