@@ -2,6 +2,7 @@ package au.ellie.hyui;
 
 import au.ellie.hyui.builders.HudBuilder;
 import au.ellie.hyui.builders.HyUIHud;
+import au.ellie.hyui.builders.LabelBuilder;
 import au.ellie.hyui.commands.HyUIAddHudCommand;
 import au.ellie.hyui.commands.HyUIRemHudCommand;
 import au.ellie.hyui.commands.HyUIUpdateHudCommand;
@@ -62,18 +63,17 @@ public class HyUIPlugin extends JavaPlugin {
                     PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
                     
                     String html = """
-                        <div id="Test" style="anchor-width: 280; anchor-height: 240; anchor-right: 1; anchor-top: 150">
-                            <div style="background-color: #000000; layout-mode: top">
-                                <img src="lizard.png" width="100" height="60">
-                                <label id="Hello">Initial Text</label>
-                            </div>
-                        </div>
+                        <div style="layout: top"><p id="text"></p>
+                        <img src="lizard.png" width="100" height="60"></div>
                         """;
-
+                    
                     HyUIHud hud = HudBuilder.detachedHud()
                             .fromHtml(html)
                             .withRefreshRate(1000)
                             .onRefresh((h) -> {
+                                h.getById("text", LabelBuilder.class).ifPresent((builder) -> {
+                                    builder.withText("Hello, World! " + System.currentTimeMillis());
+                                });
                             })
                             .show(playerRef, store);
                 });

@@ -16,9 +16,9 @@ import java.util.function.Consumer;
  */
 public class HyUIHud extends CustomUIHud implements UIContext {
     protected final HyUInterface delegate;
-
+    protected boolean isDelayed; 
     private boolean isHidden;
-    private HyUIMultiHud parentMultiHud;
+    protected HyUIMultiHud parentMultiHud;
     private long refreshRateMs;
     private Consumer<HyUIHud> refreshListener;
     
@@ -77,6 +77,7 @@ public class HyUIHud extends CustomUIHud implements UIContext {
     public void remove() {
         if (parentMultiHud != null) {
             parentMultiHud.removeHud(this);
+            hide();
         }
     }
 
@@ -85,6 +86,7 @@ public class HyUIHud extends CustomUIHud implements UIContext {
      */
     public void readd() {
         if (parentMultiHud != null) {
+            unhide();
             parentMultiHud.showHud(this);
         }
     }
@@ -98,8 +100,8 @@ public class HyUIHud extends CustomUIHud implements UIContext {
         this.parentMultiHud = parentMultiHud;
         if (this.parentMultiHud != null) {
             HyUIPlugin.getLog().logInfo("REDRAW: HUD shown from single hud");
-            // Redraw parent.
-            this.parentMultiHud.show();
+            // Redraw ourself.
+            this.refresh();
         }
     }
     
@@ -137,6 +139,12 @@ public class HyUIHud extends CustomUIHud implements UIContext {
             refreshListener.accept(this);
         }
     }
+
+    public void refresh() {
+        UICommandBuilder uiCommandBuilder = new UICommandBuilder();
+        this.build(uiCommandBuilder);
+        this.update(false, uiCommandBuilder);
+    }
     
     @Override
     public Optional<Object> getValue(String id) {
@@ -151,7 +159,7 @@ public class HyUIHud extends CustomUIHud implements UIContext {
         UICommandBuilder builder = new UICommandBuilder();
         delegate.buildFromCommandBuilder(builder);
         HyUIPlugin.getLog().logInfo("REDRAW: HUD SET VISIBILITY from single hud");
-        this.update(true, builder);
+        this.update(false, builder);
         isHidden = !isHidden;
     }
 

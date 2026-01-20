@@ -6,6 +6,7 @@ import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 
 import javax.annotation.Nonnull;
+import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  * This allows multiple HUD elements to coexist in the single HUD slot provided by Hytale.
  */
 public class HyUIMultiHud extends CustomUIHud {
+    protected static boolean hasHudManager = false;
     private final Map<String, HyUIHud> huds = new LinkedHashMap<>();
     private final Map<String, HyUIHud> removedHuds = new LinkedHashMap<>();
     
@@ -34,6 +36,16 @@ public class HyUIMultiHud extends CustomUIHud {
         startRefreshTask();
     }
 
+    public void refreshAll() {
+        if (hasHudManager) {
+            UICommandBuilder uiCommandBuilder = new UICommandBuilder();
+            this.build(uiCommandBuilder);
+            this.update(false, uiCommandBuilder);
+        } else {
+            this.show();
+        }
+    }
+    
     private void startRefreshTask() {
         if (refreshTask == null || refreshTask.isCancelled()) {
             refreshTask = scheduler.scheduleAtFixedRate(this::checkRefreshes, 100, 100, TimeUnit.MILLISECONDS);
@@ -66,12 +78,17 @@ public class HyUIMultiHud extends CustomUIHud {
                         hud.triggerRefresh();
                         needsRefresh = true;
                         lastRefreshTimes.put(name, now);
+                        if (periodicShowEnabled) {
+                            // DO NOT ever show. call .refresh() on hyui hud which just calls the build method on it.
+                            // Show will overwrite the current UI and mess up HUD managers/our own setup.
+                            hud.refresh();
+                        }
                     }
                 }
             }
         }
         
-        if (needsRefresh) {
+        /*if (needsRefresh) {
             HyUIPlugin.getLog().logInfo("REFRESH.");
             //this.build(new UICommandBuilder());
             
@@ -79,7 +96,7 @@ public class HyUIMultiHud extends CustomUIHud {
             if (periodicShowEnabled) {
                 this.show();
             }
-        }
+        }*/
     }
 
     /**
@@ -108,7 +125,7 @@ public class HyUIMultiHud extends CustomUIHud {
             removed.showWithMultiHud(null);
             HyUIPlugin.getLog().logInfo("REDRAW: HUD removed from multi-hud: " + name);
             // Redraw self.
-            this.show();
+            this.refreshAll();
         }
     }
     
@@ -142,7 +159,7 @@ public class HyUIMultiHud extends CustomUIHud {
         }
         HyUIPlugin.getLog().logInfo("REDRAW: HUD removed from multi-hud: " + keyToRemove);
         // Redraw self.
-        this.show();
+        this.refreshAll();
     }
 
     /**
@@ -159,7 +176,7 @@ public class HyUIMultiHud extends CustomUIHud {
             removedHuds.put(name, hud);
             HyUIPlugin.getLog().logInfo("REDRAW: HUD hidden from multi-hud: " + name);
             // Redraw self.
-            this.show();
+            this.refreshAll();
         }
     }
 
@@ -195,7 +212,7 @@ public class HyUIMultiHud extends CustomUIHud {
             }
             HyUIPlugin.getLog().logInfo("REDRAW: HUD shown from multi-hud: " + name);
             // Redraw self.
-            this.show();
+            this.refreshAll();
         }
     }
 
@@ -218,6 +235,7 @@ public class HyUIMultiHud extends CustomUIHud {
 
     @Override
     public void build(@Nonnull UICommandBuilder uiCommandBuilder) {
+        HyUIPlugin.getLog().logInfo("HELLO BUILDING WITH " + huds.size() + " HUDS!!!");
         if (periodicShowEnabled && authorizedBuildAttempts < 10) {
             // Check who calls this.
             // If it is being called by something else that is 
@@ -232,7 +250,8 @@ public class HyUIMultiHud extends CustomUIHud {
 
             if (!allowed) {
                 unauthorizedBuildAttempts++;
-                if (unauthorizedBuildAttempts < 1) {
+                // Slightly increase to two, hoping this helps.
+                if (unauthorizedBuildAttempts < 2) {
                     HyUIPlugin.getLog().logInfo("BUILD IGNORED: Build called from outside Hypixel package (Attempt " + unauthorizedBuildAttempts + ")");
                     return;
                 } else {
@@ -243,7 +262,7 @@ public class HyUIMultiHud extends CustomUIHud {
                 authorizedBuildAttempts++;
             }
         }
-
+        
         synchronized (huds) {
             for (HyUIHud hud : huds.values()) {
                 hud.build(uiCommandBuilder);

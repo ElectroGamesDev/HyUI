@@ -13,12 +13,16 @@ import javax.annotation.Nonnull;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class HudBuilder extends InterfaceBuilder<HudBuilder> {
     private final PlayerRef playerRef;
     private long refreshRateMs = 0;
     private Consumer<HyUIHud> refreshListener;
+    private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     public HudBuilder(PlayerRef playerRef) {
         this.playerRef = playerRef;
@@ -93,8 +97,33 @@ public class HudBuilder extends InterfaceBuilder<HudBuilder> {
      */
     public HyUIHud show(@Nonnull PlayerRef playerRefParam, Store<EntityStore> store) {
         Player playerComponent = store.getComponent(playerRefParam.getReference(), Player.getComponentType());
-        HyUIMultiHud multiHudToUse = getOrCreateMultiHud(playerComponent, playerRefParam);
-        return addTo(playerRefParam, multiHudToUse, "HUD_" + System.currentTimeMillis());
+        MultiHudResult result = getOrCreateMultiHud(playerComponent, playerRefParam);
+        String name = "HUD_" + System.currentTimeMillis();
+        if (result.isIncompatibleMod) {
+            HyUIPlugin.getLog().logInfo("Incompatible mod detected, delaying HUD addition by 3 seconds.");
+            var delayedHud = new HyUIHud(playerRefParam, uiFile, getTopLevelElements(), editCallbacks);
+            delayedHud.isDelayed = true;
+            scheduler.schedule(() -> {
+                HyUIPlugin.getLog().logInfo("Incompatible mod: Attempting to show HUD (delayed).");
+                delayedHud.isDelayed = false;
+                delayedHud.setRefreshRateMs(refreshRateMs);
+                delayedHud.setRefreshListener(refreshListener);
+                HyUIPlugin.getLog().logInfo("Adding to a MultiHud: " + name);
+                
+                MultiHudResult r = getOrCreateMultiHud(playerComponent, playerRefParam);
+                if (r.isIncompatibleMod) {
+                    HyUIPlugin.getLog().logInfo("Unable to work with incompatible mod. Abandoning...");
+                    return;
+                }
+                // Set HUD itself will redraw the parent and itself by proxy.
+                r.multiHud.setHud(name, delayedHud);
+                
+                HyUIPlugin.getLog().logInfo("Incompatible mod: HUD shown.");
+            }, 1, TimeUnit.SECONDS);
+            // We return a dummy/placeholder since it's delayed.
+            return delayedHud;
+        }
+        return addTo(playerRefParam, result.multiHud, name);
     }
 
     
@@ -126,44 +155,106 @@ public class HudBuilder extends InterfaceBuilder<HudBuilder> {
     }
 
     @NonNullDecl
-    private static HyUIMultiHud getOrCreateMultiHud(@Nonnull Player player,
+    private static MultiHudResult getOrCreateMultiHud(@Nonnull Player player,
                                                     @NonNullDecl PlayerRef playerRefParam) {
+        HyUIPlugin.getLog().logInfo("getOrCreateMultiHud called");
         HudManager hudManager = player.getHudManager();
+        HyUIPlugin.getLog().logInfo("hudManager retrieved");
         CustomUIHud currentHud = hudManager.getCustomHud();
-        
+        HyUIPlugin.getLog().logInfo("currentHud retrieved: " + (currentHud == null ? "null" : currentHud.getClass().getName()));
+
         HyUIMultiHud multiHudToUse = null;
+        boolean incompatibleMod = false;
 
-        if (currentHud instanceof HyUIMultiHud) {
-            multiHudToUse = (HyUIMultiHud) currentHud;
-        } else if (currentHud != null && "MultipleCustomUIHud".equals(currentHud.getClass().getSimpleName())) {
-            // We support multiple hud mod by adding our own multi-hud to the existing one :3.
+        try {
+            HyUIPlugin.getLog().logInfo("Attempting to find MultipleHUD class");
+            Class<?> multipleHudClass = Class.forName("com.buuz135.mhud.MultipleHUD");
+            HyUIPlugin.getLog().logInfo("MultipleHUD class found");
+            Method getInstanceMethod = multipleHudClass.getDeclaredMethod("getInstance");
+            HyUIPlugin.getLog().logInfo("getInstance method found");
+            Object multipleHudInstance = getInstanceMethod.invoke(null);
+            HyUIPlugin.getLog().logInfo("MultipleHUD instance retrieved");
+
             try {
-                Method getCustomHudsMethod = currentHud.getClass().getDeclaredMethod("getCustomHuds");
-                getCustomHudsMethod.setAccessible(true);
-                @SuppressWarnings("unchecked")
-                HashMap<String, CustomUIHud> customHuds =
-                        (HashMap<String, CustomUIHud>) getCustomHudsMethod.invoke(currentHud);
+                HyUIPlugin.getLog().logInfo("Checking if currentHud is MultipleCustomUIHud");
+                if (currentHud != null && "MultipleCustomUIHud".equals(currentHud.getClass().getSimpleName())) {
+                    HyUIPlugin.getLog().logInfo("currentHud is MultipleCustomUIHud, attempting to get customHuds map");
+                    try {
+                        Method getCustomHudsMethod = currentHud.getClass().getDeclaredMethod("getCustomHuds");
+                        HyUIPlugin.getLog().logInfo("getCustomHuds method found");
+                        getCustomHudsMethod.setAccessible(true);
+                        HyUIPlugin.getLog().logInfo("getCustomHuds method set accessible");
+                        @SuppressWarnings("unchecked")
+                        HashMap<String, CustomUIHud> customHuds =
+                                (HashMap<String, CustomUIHud>) getCustomHudsMethod.invoke(currentHud);
+                        HyUIPlugin.getLog().logInfo("customHuds map retrieved");
 
-                CustomUIHud existing = customHuds.get("HyUIHUD");
-                if (existing instanceof HyUIMultiHud) {
-                    multiHudToUse = (HyUIMultiHud) existing;
-                } else {
+                        CustomUIHud existing = customHuds.get("HyUIHUD");
+                        HyUIPlugin.getLog().logInfo("Existing HyUIHUD check: " + (existing == null ? "null" : existing.getClass().getName()));
+                        if (existing instanceof HyUIMultiHud) {
+                            multiHudToUse = (HyUIMultiHud) existing;
+                            HyUIPlugin.getLog().logInfo("Existing HyUIMultiHud found and assigned");
+                        }
+                    } catch (Exception ex) {
+                        HyUIPlugin.getLog().logInfo("Failed to interact with MultipleCustomUIHud: " + ex.getMessage());
+                    }
+                } 
+                if (multiHudToUse == null)
+                {
+                    HyUIPlugin.getLog().logInfo("multiHudToUse is null, creating new HyUIMultiHud");
                     multiHudToUse = new HyUIMultiHud(playerRefParam);
-                    customHuds.put("HyUIHUD", multiHudToUse);
+                    HyUIPlugin.getLog().logInfo("New HyUIMultiHud created");
+                    Method setCustomHudMethod = multipleHudClass.getDeclaredMethod("setCustomHud", Player.class, PlayerRef.class, String.class, CustomUIHud.class);
+                    HyUIPlugin.getLog().logInfo("setCustomHud method found");
+                    
+                    // Make sure we set the alert so we can properly show/not show.
+                    HyUIMultiHud.hasHudManager = true;
+                    
+                    // Register simplepartyhud if it exists
+                    if (currentHud != null && "PartyHud".equals(currentHud.getClass().getSimpleName())) {
+                        HyUIPlugin.getLog().logInfo("Current HUD is PartyHud. Setting incompatible flag.");
+                        incompatibleMod = true;
+                        return new MultiHudResult(null, true);
+                    }
+                    setCustomHudMethod.invoke(multipleHudInstance, player, playerRefParam, "HyUIHUD", multiHudToUse);
+                    HyUIPlugin.getLog().logInfo("Successfully hooked into MultipleHUD and registered HyUIMultiHUD!");
                 }
-            } catch (NoSuchMethodException | InvocationTargetException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                
+            } catch (InvocationTargetException e) {
+                HyUIPlugin.getLog().logInfo("InvocationTargetException during MultipleHUD registration: " + e.getTargetException().getMessage());
+            } catch (Exception e) {
+                multiHudToUse = null;
+                HyUIPlugin.getLog().logInfo("Failed to register with MultipleHUD: " + e.getMessage());
             }
+        } catch (ClassNotFoundException ignored) {
+            HyUIPlugin.getLog().logInfo("MultipleHUD mod not present (ClassNotFoundException)");
+        } catch (Exception e) {
+            multiHudToUse = null;
+            HyUIPlugin.getLog().logInfo("Failed to hook into MultipleHUD: " + e.getMessage());
+        }
+        
+
+        // If still no multi-hud, create one
+        HyUIPlugin.getLog().logInfo("Final multiHudToUse check: " + (multiHudToUse == null ? "null" : "not null"));
+        if (multiHudToUse == null) {
+            HyUIPlugin.getLog().logInfo("Creating fallback HyUIMultiHud");
+            multiHudToUse = new HyUIMultiHud(playerRefParam);
+            HyUIPlugin.getLog().logInfo("Fallback HyUIMultiHud created");
+            hudManager.setCustomHud(playerRefParam, multiHudToUse);
+            HyUIPlugin.getLog().logInfo("Fallback HyUIMultiHud set in hudManager");
         }
 
-        // If it is simply not possible to determine what mod has the hud, overwrite it.
-        // TODO: Potentially wrap that mod which has a hud currently into our own multihud solution?
-        if (multiHudToUse == null) {
-            multiHudToUse = new HyUIMultiHud(playerRefParam);
-            hudManager.setCustomHud(playerRefParam, multiHudToUse);
+        HyUIPlugin.getLog().logInfo("getOrCreateMultiHud returning");
+        return new MultiHudResult(multiHudToUse, incompatibleMod);
+    }
+
+    private static class MultiHudResult {
+        final HyUIMultiHud multiHud;
+        final boolean isIncompatibleMod;
+
+        MultiHudResult(HyUIMultiHud multiHud, boolean isIncompatibleMod) {
+            this.multiHud = multiHud;
+            this.isIncompatibleMod = isIncompatibleMod;
         }
-        return multiHudToUse;
     }
 }
