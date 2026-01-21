@@ -28,6 +28,7 @@ import java.util.function.Consumer;
 public class PageBuilder extends InterfaceBuilder<PageBuilder> {
     private final PlayerRef playerRef;
     private CustomPageLifetime lifetime = CustomPageLifetime.CanDismiss;
+    private HyUIPage lastPage;
 
     /**
      * Constructs a new instance of the PageBuilder class.
@@ -87,12 +88,15 @@ public class PageBuilder extends InterfaceBuilder<PageBuilder> {
      * class, then instructs the page manager to open the page.
      *
      * @param store The store containing the entity data required to configure and display the page.
+     * @return The created HyUIPage instance.
      */
-    public void open(Store<EntityStore> store) {
+    public HyUIPage open(Store<EntityStore> store) {
         assert playerRef != null : "Player reference cannot be null. Use override for open(Store<ECS>) if reusing this builder.";
         Player playerComponent = store.getComponent(playerRef.getReference(), Player.getComponentType());
         PageManager pageManager = playerComponent.getPageManager();
-        pageManager.openCustomPage(playerRef.getReference(), store, new HyUIPage(playerRef, lifetime, uiFile, getTopLevelElements(), editCallbacks));
+        this.lastPage = new HyUIPage(playerRef, lifetime, uiFile, getTopLevelElements(), editCallbacks);
+        pageManager.openCustomPage(playerRef.getReference(), store, this.lastPage);
+        return this.lastPage;
     }
 
     /**
@@ -103,10 +107,24 @@ public class PageBuilder extends InterfaceBuilder<PageBuilder> {
      *
      * @param playerRefParam The player reference for whom the page is being opened.
      * @param store The store containing the entity data required to configure and display the page.
+     * @return The created HyUIPage instance.
      */
-    public void open(@Nonnull PlayerRef playerRefParam, Store<EntityStore> store) {
+    public HyUIPage open(@Nonnull PlayerRef playerRefParam, Store<EntityStore> store) {
         Player playerComponent = store.getComponent(playerRefParam.getReference(), Player.getComponentType());
         PageManager pageManager = playerComponent.getPageManager();
-        pageManager.openCustomPage(playerRefParam.getReference(), store, new HyUIPage(playerRefParam, lifetime, uiFile, getTopLevelElements(), editCallbacks));
+        this.lastPage = new HyUIPage(playerRefParam, lifetime, uiFile, getTopLevelElements(), editCallbacks);
+        pageManager.openCustomPage(playerRefParam.getReference(), store, this.lastPage);
+        return this.lastPage;
+    }
+
+    /**
+     * Retrieves the list of logged UI commands from the last opened page.
+     * @return A list of strings representing the logged commands, or an empty list if no page has been opened.
+     */
+    public List<String> getCommandLog() {
+        if (lastPage == null) {
+            return List.of();
+        }
+        return lastPage.getCommandLog();
     }
 }

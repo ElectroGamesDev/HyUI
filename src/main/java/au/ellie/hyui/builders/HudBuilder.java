@@ -7,6 +7,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
@@ -15,6 +16,7 @@ public class HudBuilder extends InterfaceBuilder<HudBuilder> {
     private final PlayerRef playerRef;
     private long refreshRateMs = 0;
     private Consumer<HyUIHud> refreshListener;
+    private HyUIHud lastHud;
     private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     public HudBuilder(PlayerRef playerRef) {
@@ -92,15 +94,15 @@ public class HudBuilder extends InterfaceBuilder<HudBuilder> {
         Player playerComponent = store.getComponent(playerRefParam.getReference(), Player.getComponentType());
         String name = "HYUIHUD" + System.currentTimeMillis();
         
-        var hyUIHud = new HyUIHud(name, playerRefParam, store, uiFile, getTopLevelElements(), editCallbacks);
-        hyUIHud.setRefreshRateMs(refreshRateMs);
-        hyUIHud.setRefreshListener(refreshListener);
+        this.lastHud = new HyUIHud(name, playerRefParam, store, uiFile, getTopLevelElements(), editCallbacks);
+        this.lastHud.setRefreshRateMs(refreshRateMs);
+        this.lastHud.setRefreshListener(refreshListener);
         HyUIPlugin.getLog().logInfo("Adding to a MultiHud: " + name);
 
         // Show it.
-        hyUIHud.add();
+        this.lastHud.add();
         
-        return hyUIHud;
+        return this.lastHud;
     }
     
     /**
@@ -108,6 +110,18 @@ public class HudBuilder extends InterfaceBuilder<HudBuilder> {
      * @param hudRef The HyUIHud instance to update.
      */
     public void updateExisting(@Nonnull HyUIHud hudRef) {
+        this.lastHud = hudRef;
         hudRef.update(this);
+    }
+
+    /**
+     * Retrieves the list of logged UI commands from the last shown HUD.
+     * @return A list of strings representing the logged commands, or an empty list if no HUD has been shown.
+     */
+    public List<String> getCommandLog() {
+        if (lastHud == null) {
+            return List.of();
+        }
+        return lastHud.getCommandLog();
     }
 }

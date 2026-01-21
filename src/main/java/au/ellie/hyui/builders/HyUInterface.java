@@ -1,5 +1,6 @@
 package au.ellie.hyui.builders;
 
+import au.ellie.hyui.HyUIPluginLogger;
 import au.ellie.hyui.events.UIContext;
 import au.ellie.hyui.events.UIEventListener;
 import com.hypixel.hytale.component.Ref;
@@ -13,6 +14,7 @@ import au.ellie.hyui.events.UIEventActions;
 import au.ellie.hyui.events.DynamicPageData;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,11 +27,17 @@ public abstract class HyUInterface implements UIContext {
     protected List<UIElementBuilder<?>> elements;
     protected List<Consumer<UICommandBuilder>> editCallbacks;
     protected Map<String, Object> elementValues = new HashMap<>();
+    protected List<String> commandLog = new ArrayList<>();
 
     public HyUInterface(String uiFile, List<UIElementBuilder<?>> elements, List<Consumer<UICommandBuilder>> editCallbacks) {
         this.uiFile = uiFile;
         this.elements = elements;
         this.editCallbacks = editCallbacks;
+    }
+
+    @Override
+    public List<String> getCommandLog() {
+        return new ArrayList<>(commandLog);
     }
 
     @Override
@@ -42,14 +50,24 @@ public abstract class HyUInterface implements UIContext {
         return Optional.empty();
     }
 
+    @Override
+    public void updatePage(boolean shouldClose) {}
+    
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder, @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
         HyUIPlugin.getLog().logInfo("Building HyUInterface" + (uiFile != null ? " from file: " + uiFile : ""));
+        
+        LoggingUICommandBuilder loggingBuilder = new LoggingUICommandBuilder();
+
         if (uiFile != null) {
+            if (HyUIPluginLogger.LOGGING_ENABLED)
+                loggingBuilder.append(uiFile);
             uiCommandBuilder.append(uiFile);
         }
 
         if (editCallbacks != null) {
             for (Consumer<UICommandBuilder> callback : editCallbacks) {
+                if (HyUIPluginLogger.LOGGING_ENABLED)
+                    callback.accept(loggingBuilder);
                 callback.accept(uiCommandBuilder);
             }
         }
@@ -57,18 +75,29 @@ public abstract class HyUInterface implements UIContext {
         elementValues.clear();
         for (UIElementBuilder<?> element : elements) {
             captureInitialValues(element);
+            if (HyUIPluginLogger.LOGGING_ENABLED)
+                element.build(loggingBuilder, new UIEventBuilder());
             element.build(uiCommandBuilder, uiEventBuilder);
         }
+
+        this.commandLog = loggingBuilder.getCommandLog();
     }
 
     public void buildFromCommandBuilder(@Nonnull UICommandBuilder uiCommandBuilder) {
         HyUIPlugin.getLog().logInfo("Building HyUInterface " + (uiFile != null ? " from file: " + uiFile : ""));
+        
+        LoggingUICommandBuilder loggingBuilder = new LoggingUICommandBuilder();
+
         if (uiFile != null) {
+            if (HyUIPluginLogger.LOGGING_ENABLED)
+                loggingBuilder.append(uiFile);
             uiCommandBuilder.append(uiFile);
         }
 
         if (editCallbacks != null) {
             for (Consumer<UICommandBuilder> callback : editCallbacks) {
+                if (HyUIPluginLogger.LOGGING_ENABLED)
+                    callback.accept(loggingBuilder);
                 callback.accept(uiCommandBuilder);
             }
         }
@@ -76,8 +105,12 @@ public abstract class HyUInterface implements UIContext {
         elementValues.clear();
         for (UIElementBuilder<?> element : elements) {
             captureInitialValues(element);
+            if (HyUIPluginLogger.LOGGING_ENABLED)
+                element.build(loggingBuilder, null);
             element.build(uiCommandBuilder, null);
         }
+
+        this.commandLog = loggingBuilder.getCommandLog();
     }
 
     protected void captureInitialValues(UIElementBuilder<?> element) {

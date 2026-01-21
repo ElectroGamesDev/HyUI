@@ -2,13 +2,21 @@ package au.ellie.hyui.events;
 
 import au.ellie.hyui.builders.HyUIHud;
 import au.ellie.hyui.builders.HyUIPage;
+import au.ellie.hyui.builders.LabelBuilder;
+import au.ellie.hyui.builders.UIElementBuilder;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
  * Provides access to the current state of UI elements on the page.
  */
 public interface UIContext {
+    /**
+     * Retrieves the list of logged UI commands.
+     * @return A list of strings representing the logged commands.
+     */
+    List<String> getCommandLog();
     /**
      * Retrieves the current value of an element by its ID.
      *
@@ -33,4 +41,21 @@ public interface UIContext {
      * @return The page associated with this context, or empty if not a page.
      */
     Optional<HyUIPage> getPage();
+
+    /**
+     * Updates the page associated with this context, rebuilding it if necessary.
+     * Does not update HUDs.
+     * @param shouldClear Whether to clear the page before rebuilding.
+     */
+    void updatePage(boolean shouldClear);
+
+    /**
+     * Retrieves the builder for a particular element, cast to the specified builder.
+     *
+     * @param id   The ID of the element.
+     * @param clazz The class of the type to cast to.
+     * @param <E>  The expected type of the value.
+     * @return An Optional containing the builder, or empty if not found or if casting fails.
+     */
+    <E extends UIElementBuilder<E>> Optional<E> getById(String id, Class<E> clazz);
 }

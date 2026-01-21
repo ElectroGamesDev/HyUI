@@ -7,18 +7,17 @@ import au.ellie.hyui.events.UIEventActions;
 import au.ellie.hyui.events.UIEventListener;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.protocol.packets.interface_.CustomPage;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class HyUIPage extends InteractiveCustomUIPage<DynamicPageData> implements UIContext {
@@ -27,6 +26,11 @@ public class HyUIPage extends InteractiveCustomUIPage<DynamicPageData> implement
     public HyUIPage(PlayerRef playerRef, CustomPageLifetime lifetime, String uiFile, List<UIElementBuilder<?>> elements, List<Consumer<UICommandBuilder>> editCallbacks) {
         super(playerRef, lifetime, DynamicPageData.CODEC);
         this.delegate = new HyUInterface(uiFile, elements, editCallbacks) {};
+    }
+
+    @Override
+    public List<String> getCommandLog() {
+        return delegate.getCommandLog();
     }
 
     @Override
@@ -41,6 +45,24 @@ public class HyUIPage extends InteractiveCustomUIPage<DynamicPageData> implement
     
     public void close() {
         super.close();
+    }
+    
+    @Override
+    public void updatePage(boolean shouldClear) {
+        Ref<EntityStore> ref = this.playerRef.getReference();
+        if (ref != null) {
+            Store<EntityStore> store = ref.getStore();
+            Player playerComponent = (Player)store.getComponent(ref, Player.getComponentType());
+            UICommandBuilder commandBuilder = new UICommandBuilder();
+            UIEventBuilder eventBuilder = new UIEventBuilder();
+            this.build(ref, commandBuilder, eventBuilder, ref.getStore());
+            playerComponent.getPageManager().updateCustomPage(new CustomPage(this.getClass().getName(), false, shouldClear, this.lifetime, commandBuilder.getCommands(), eventBuilder.getEvents()));
+        }
+    }
+
+    @Override
+    public <E extends UIElementBuilder<E>> Optional<E> getById(String id, Class<E> clazz) {
+        return delegate.getById(id, clazz);
     }
 
     @Override

@@ -6,6 +6,7 @@ import au.ellie.hyui.events.UIEventActions;
 import au.ellie.hyui.elements.UIElements;
 import au.ellie.hyui.theme.Theme;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
+import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
@@ -134,9 +135,13 @@ public class SliderBuilder extends UIElementBuilder<SliderBuilder> {
         }
 
         if (hyUIStyle == null && style != null) {
+            HyUIPlugin.getLog().logInfo("Setting Style for Slider " + selector);
             commands.set(selector + ".Style", style);
+        } else {
+            HyUIPlugin.getLog().logInfo("Setting Style for Slider to DefaultSliderStyle " + selector);
+            commands.set(selector + ".Style", Value.ref("Common.ui", "DefaultSliderStyle"));
         }
-
+        
         listeners.forEach(listener -> {
             if (listener.type() == CustomUIEventBindingType.ValueChanged) {
                 String eventId = getEffectiveId();

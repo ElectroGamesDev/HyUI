@@ -11,6 +11,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executors;
@@ -80,7 +81,7 @@ public class HyUIHud extends CustomUIHud implements UIContext {
         if (rate > 0) {
             if (now - lastRefreshTime >= rate) {
                 triggerRefresh();
-                refreshOrRerender(true);
+                refreshOrRerender(true, false);
                 lastRefreshTime = now;
             }
         }
@@ -121,7 +122,7 @@ public class HyUIHud extends CustomUIHud implements UIContext {
      */
     public void update(HudBuilder updatedHudBuilder) {
         UICommandBuilder builder = configureFrom(updatedHudBuilder);
-        refreshOrRerender(true);
+        refreshOrRerender(true, false);
     }
 
     /**
@@ -135,6 +136,19 @@ public class HyUIHud extends CustomUIHud implements UIContext {
         store.getExternalData().getWorld().execute(() -> {
             MultiHudWrapper.hideCustomHud(getPlayer(), getPlayerRef(), this.name);
         });
+        HyUIPlugin.getLog().logInfo("HUD removed: " + this.name);
+        refreshTask.cancel(false);
+    }
+
+    /**
+     * Remove the HUD from its parent multi-HUD. This does NOT check thread access.
+     * This will remove it from the screen for the player.
+     * and stop refreshing it.
+     *
+     * You can later associate it with another, or the same multi-HUD and show it.
+     */
+    public void removeUnsafe() {
+        MultiHudWrapper.hideCustomHud(getPlayer(), getPlayerRef(), this.name);
         HyUIPlugin.getLog().logInfo("HUD removed: " + this.name);
         refreshTask.cancel(false);
     }
@@ -154,19 +168,47 @@ public class HyUIHud extends CustomUIHud implements UIContext {
         HyUIPlugin.getLog().logInfo("HUD added: " + this.name);
         startRefreshTask();
     }
+    
+    /**
+     * Adds the HUD to its parent multi-HUD. This does NOT check thread access.
+     * Begins refresh task.
+     *
+     */
+    public void addUnsafe() {
+        MultiHudWrapper.setCustomHud(getPlayer(), getPlayerRef(), this.name, this);
+        if (refreshTask != null && !refreshTask.isCancelled()) {
+            refreshTask.cancel(false);
+        }
+        HyUIPlugin.getLog().logInfo("HUD added: " + this.name);
+        startRefreshTask();
+    }
 
     /**
      * Hides the UI from view of player.
      */
     public void hide() {
-        setVisibilityOnFirstElement(false);
+        setVisibilityOnFirstElement(false, false);
     }
 
+    /**
+     * Hides the UI from view of player. This does NOT check thread access.
+     */
+    public void hideUnsafe() {
+        setVisibilityOnFirstElement(false, true);
+    }
+    
     /**
      * Shows the UI to the player if it has previously been hidden.
      */
     public void unhide() {
-        setVisibilityOnFirstElement(true);
+        setVisibilityOnFirstElement(true, false);
+    }
+
+    /**
+     * Shows the UI to the player if it has previously been hidden. This does NOT check thread access.
+     */
+    public void unhideUnsafe() {
+        setVisibilityOnFirstElement(true, true);
     }
 
     public long getRefreshRateMs() {
@@ -190,19 +232,29 @@ public class HyUIHud extends CustomUIHud implements UIContext {
         }
     }
 
-    public void refreshOrRerender(boolean shouldRerender) {
+    public void refreshOrRerender(boolean shouldRerender, boolean unsafe) {
         if (!shouldRerender) {
             UICommandBuilder uiCommandBuilder = new UICommandBuilder();
             this.build(uiCommandBuilder);
             this.update(false, uiCommandBuilder);
         } else {
             // Re-render completely.
-            store.getExternalData().getWorld().execute(() -> {
+            if (unsafe) {
+                store.getExternalData().getWorld().execute(() -> {
+                    MultiHudWrapper.setCustomHud(getPlayer(), getPlayerRef(), this.name, this);
+                });
+            } else {
                 MultiHudWrapper.setCustomHud(getPlayer(), getPlayerRef(), this.name, this);
-            });
+            }
+
         }
     }
     
+    @Override
+    public List<String> getCommandLog() {
+        return delegate.getCommandLog();
+    }
+
     @Override
     public Optional<Object> getValue(String id) {
         return delegate.getValue(id);
@@ -213,14 +265,21 @@ public class HyUIHud extends CustomUIHud implements UIContext {
         return Optional.empty();
     }
 
-    private void setVisibilityOnFirstElement(boolean value) {
+    /**
+     * Not implemented.
+     * @param shouldClear Not implemented.
+     */
+    @Override
+    public void updatePage(boolean shouldClear) {}
+    
+    private void setVisibilityOnFirstElement(boolean value, boolean unsafe) {
         for (UIElementBuilder<?> element : delegate.getElements()) {
             element.withVisible(value);
             break;
         }
        
         HyUIPlugin.getLog().logInfo("REDRAW: HUD SET VISIBILITY from single hud");
-        this.refreshOrRerender(false);
+        this.refreshOrRerender(false, unsafe);
         // this.update(false, builder);
         isHidden = !isHidden;
     }

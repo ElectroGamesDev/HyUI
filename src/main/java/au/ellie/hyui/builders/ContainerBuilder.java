@@ -114,6 +114,11 @@ public class ContainerBuilder extends UIElementBuilder<ContainerBuilder> impleme
                 // We want to make sure children can be placed in #Title or #Content.
                 // UIElementBuilder.inside() sets parentSelector.
                 String childParent = child.parentSelector;
+
+                // Store the original parent selector so we can restore it after building.
+                // This prevents the selector from accumulating recursively on subsequent builds.
+                String originalParent = childParent;
+
                 if (childParent.equals("#Content")) {
                     child.inside(selector + " #Content").build(commands, events);
                 } else if (childParent.equals("#Title")) {
@@ -125,7 +130,11 @@ public class ContainerBuilder extends UIElementBuilder<ContainerBuilder> impleme
                     // Fallback
                     child.inside(selector + " " + childParent).build(commands, events);
                 }
+
+                // Restore the original parent selector
+                child.inside(originalParent);
             }
         }
     }
 }
+

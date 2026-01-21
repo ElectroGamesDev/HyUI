@@ -157,7 +157,21 @@ public class ProgressBarBuilder extends UIElementBuilder<ProgressBarBuilder> imp
         this.outerAnchor = outerAnchor;
         return this;
     }
+    
+    @Override
+    protected void buildBase(UICommandBuilder commands, UIEventBuilder events) {
+        // Temporarily hide the anchor from buildBase so it doesn't apply to the inner element
+        HyUIAnchor originalAnchor = this.anchor;
+        if (this.outerAnchor == null) {
+            this.anchor = null;
+        }
 
+        super.buildBase(commands, events);
+
+        // Restore it immediately after buildBase completes
+        this.anchor = originalAnchor;
+    }
+    
     @Override
     protected void onBuild(UICommandBuilder commands, UIEventBuilder events) {
         String selector = getSelector();
@@ -165,24 +179,17 @@ public class ProgressBarBuilder extends UIElementBuilder<ProgressBarBuilder> imp
 
         // Apply LayoutMode and Background to the outer group if it exists
         String outerSelector = "#HyUIOuterProgressBar";
-        // getSelector() returns something like "#Parent #HyUIProgressBar"
-        // If we have a parent, we should prepend it to the outer selector
         if (parentSelector != null) {
             outerSelector = parentSelector + " " + outerSelector;
         }
-        
+
         applyLayoutMode(commands, outerSelector);
         applyBackground(commands, outerSelector);
 
-        if (outerAnchor != null) {
-            commands.setObject(outerSelector + ".Anchor", outerAnchor.toHytaleAnchor());
-        }
-        // We hack around due to HYUIML not having outer anchors and people likely wrongly assuming
-        // that outer anchors do nothing and applying it to the progressbar's own anchors.
-        // If we let them set the inner anchor but not outer then things look veeeery funky.
-        if (outerAnchor == null && anchor != null) {
-            commands.setObject(outerSelector + ".Anchor", anchor.toHytaleAnchor());
-            anchor = null;
+        // Use outerAnchor if provided, otherwise fallback to the standard anchor
+        HyUIAnchor effectiveOuterAnchor = (outerAnchor != null) ? outerAnchor : anchor;
+        if (effectiveOuterAnchor != null) {
+            commands.setObject(outerSelector + ".Anchor", effectiveOuterAnchor.toHytaleAnchor());
         }
 
         if (value != 0.0f) {

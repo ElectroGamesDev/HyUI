@@ -112,6 +112,34 @@ PageBuilder.pageForPlayer(playerRef)
     .open(store);
 ```
 
+#### Updating Page Values
+
+You can update elements on an open page by retrieving their builders from the `UIContext`, modifying them, and calling `updatePage()`.
+
+```java
+PageBuilder.detachedPage()
+    .fromHtml("""
+        <p id="label">Clicks: 0</p>
+        <button id="btn">Click Me!</button>
+    """)
+    .addEventListener("btn", CustomUIEventBindingType.Activating, (data, ctx) -> {
+        // Increment a counter (e.g., from an AtomicInteger)
+        int newClicks = clicks.incrementAndGet();
+
+        // Get the builder for the label
+        ctx.getById("label", LabelBuilder.class).ifPresent(lb -> { 
+            // Update the builder state
+            lb.withText("Clicks: " + newClicks);
+
+            // Send the update to the client
+            ctx.updatePage(true); 
+        });
+    })
+    .open(playerRef, store);
+```
+
+> **Important**: When calling `ctx.updatePage(true)`, the page is rebuilt on the client. Due to a known issue in Hytale, `Slider` elements (created via `SliderBuilder` or `<input type="range">`) may lose their custom styles during this update.
+
 #### Modifying Base Elements
 
 If you load from a file, you can use `.editElement` to modify components defined in the `.ui` file before your dynamic elements are added.

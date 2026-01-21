@@ -525,7 +525,9 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
         String selector = getSelector();
         if (selector != null) {
             for (UIElementBuilder<?> child : children) {
+                String originalParent = child.parentSelector;
                 child.inside(selector).build(commands, events);
+                child.inside(originalParent);
             }
         }
     }

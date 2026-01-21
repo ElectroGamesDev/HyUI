@@ -5,6 +5,7 @@ import au.ellie.hyui.HyUIPluginLogger;
 import au.ellie.hyui.builders.*;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
@@ -18,6 +19,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.hypixel.hytale.server.core.command.commands.player.inventory.InventorySeeCommand.MESSAGE_COMMANDS_ERRORS_PLAYER_NOT_IN_WORLD;
 
@@ -105,6 +107,7 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                             </div>
                             <div class="container-contents">
                                 <p id="welcome-msg" style="padding: 100 200">Welcome to HyUIML parser!</p>
+                                <p id="label">Clicks: 0</p>
                                 <div class="input-row" style="padding-left: 50; padding-top: 20;">
                                      Free text here should be a label!
                                     <input type="text" id="myInput"/>
@@ -131,7 +134,7 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                         </div>
                     </div>
                     """;
-            html = """
+/*            html = """
                     <style>
                                  #Button {
                                      layout-mode: Left;
@@ -193,7 +196,7 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                             </div>
                     
                              </div>
-                    """;
+                    """;*/
             // TODO: 
             // -- Support opacity on text color. 
             // -- Support :hover sub-style (Just Style: (Hovered: ...)).
@@ -202,26 +205,38 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
             //HyUIHud hudInstance = HudBuilder.detachedHud()
             //        .fromHtml(html)
             //        .show(playerRef, store);
-
+            AtomicInteger clicks = new AtomicInteger();
             PageBuilder builder = PageBuilder.detachedPage()
                     .fromHtml(html)
-                    .withLifetime(CustomPageLifetime.CanDismiss);
-                /*.addEventListener("btn1", CustomUIEventBindingType.Activating, (data, ctx) -> {
-                    playerRef.sendMessage(Message.raw("Button clicked via PageBuilder ID lookup!: " + 
+                    .withLifetime(CustomPageLifetime.CanDismiss)
+                .addEventListener("btn1", CustomUIEventBindingType.Activating, (data, ctx) -> {
+                    playerRef.sendMessage(Message.raw("Button clicked via PageBuilder ID lookup!: " +
                     ctx.getValue("myInput", String.class).orElse("N/A")));
-                    ctx.getPage().ifPresent(HyUIPage::close);
+                    HyUIPlugin.getLog().logInfo("Clicked button.");
+                    ctx.getById("label", LabelBuilder.class).ifPresent(lb -> { 
+                        lb.withText("ClicksA: " + String.valueOf(clicks.incrementAndGet()));
+                        HyUIPlugin.getLog().logInfo("Found label builder.");
+                        ctx.updatePage(true);
+                        for (String s : ctx.getCommandLog()) {
+                            HyUIPlugin.getLog().logInfo(s);
+                        }
+                        HyUIPlugin.getLog().logInfo("Updated page.");
+                    });
                 })
                 .addEventListener("myInput", CustomUIEventBindingType.ValueChanged, String.class, (val) -> {
                     playerRef.sendMessage(Message.raw("Input changed to: " + val));
-                });*/
+                });
 
             // Or ... if you don't like building in method chains or want something custom...
-        /*builder.getById("myInput", TextFieldBuilder.class).ifPresent(input -> {
+        builder.getById("myInput", TextFieldBuilder.class).ifPresent(input -> {
             input.addEventListener(CustomUIEventBindingType.ValueChanged, (val) -> {
                 playerRef.sendMessage(Message.raw("Input changed to: " + val));
             });
-        });*/
+        });
             builder.open(playerRef, store);
+            for (String s : builder.getCommandLog()) {
+                HyUIPlugin.getLog().logInfo(s);
+            }
         }
     }
 
