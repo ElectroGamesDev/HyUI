@@ -344,6 +344,14 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
         }
     }
 
+    protected boolean hasCustomInlineContent() {
+        return false;
+    }
+
+    protected String generateCustomInlineContent() {
+        return null;
+    }
+
     protected void buildBase(UICommandBuilder commands, UIEventBuilder events) {
         String selector = getSelector();
         HyUIPlugin.getLog().logInfo("Building element: " + (typeSelector != null ? typeSelector : elementPath) + " with ID: " + id + " at selector: " + selector);
@@ -360,6 +368,10 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
                      // We might need to rename the element we just appended.
                      // Let's assume for now that if it's not wrapped, it's a singleton or handled by user.
                 }
+            } else if (hasCustomInlineContent()) {
+                String inline = generateCustomInlineContent();
+                HyUIPlugin.getLog().logInfo("Appending custom inline: " + inline + " to " + parentSelector);
+                commands.appendInline(parentSelector, inline);
             } else {
                 String inline = generateBasicInlineMarkup();
                 HyUIPlugin.getLog().logInfo("Appending inline: " + inline + " to " + parentSelector);

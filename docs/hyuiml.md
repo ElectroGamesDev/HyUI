@@ -28,7 +28,7 @@ PageBuilder.pageForPlayer(playerRef)
 | `<div>`                   | `GroupBuilder` | Use for layout and containers.                                    |
 | `<p>`                     | `LabelBuilder` | Standard text labels.                                             |
 | `<label>`                 | `LabelBuilder` | Similar to `<p>`, often used for form field descriptions.         |
-| `<button>`                | `ButtonBuilder` | Standard buttons. Use `class="back-button"` for a back button.    |
+| `<button>`                | `ButtonBuilder` | Standard buttons. Use `class="back-button"`, `class="secondary-button"`, or `class="tertiary-button"` for themed variants. |
 | `<input type="text">`     | `TextFieldBuilder` | Text input fields.                                                |
 | `<input type="password">` | `TextFieldBuilder` | Masked password input fields.                                     |
 | `<input type="number">`   | `NumberFieldBuilder` | Numeric input fields.                                             |
@@ -40,6 +40,7 @@ PageBuilder.pageForPlayer(playerRef)
 | `<span class="item-icon">` | `ItemIconBuilder` | Displays an item icon. Use `data-hyui-item-id` for the item icon. |
 | `<img>`                   | `ImageBuilder` | Displays an image. Use `src` for the path.                        |
 | `<select>`                | `DropdownBoxBuilder` | Dropdown selection lists. Use `<option>` children for entries.   |
+| `<sprite>`                | `SpriteBuilder` | Displays an animated sprite.                                     |
 
 #### Attributes
 
@@ -50,6 +51,7 @@ HYUIML supports several standard and custom attributes:
 *   `value`: Sets the initial value for input elements.
 *   `min`, `max`, `step`: Specific to sliders (`input type="range"`).
 *   `checked`: Specific to checkboxes (`true` or `false`).
+*   `format`: Number format string for `<input type="number">`.
 *   `placeholder`: Hint text for text/password inputs.
 *   `maxlength`: Maximum character limit for text/password inputs.
 *   `readonly`: Makes text/password inputs read-only (`true` or `false`).
@@ -57,6 +59,7 @@ HYUIML supports several standard and custom attributes:
 *   `data-hyui-title`: Specific to containers/overlays to set the header title.
 *   `data-hyui-tooltiptext`: Adds a tooltip to the element.
 *   `data-hyui-item-id`: In-game item ID for the icon to reflect.
+*   `data-hyui-max-decimal-places`: Specific to `<input type="number">`, sets the maximum decimal places.
 *   `data-hyui-bar-texture-path`: Path to the progress bar's fill texture.
 *   `data-hyui-effect-texture-path`: Path to the progress bar's effect texture.
 *   `data-hyui-effect-width`, `data-hyui-effect-height`, `data-hyui-effect-offset`: Customizes the progress bar's effect appearance.
@@ -66,6 +69,8 @@ HYUIML supports several standard and custom attributes:
 *   `data-hyui-maxselection`: Specific to `<select>`, number of maximum selectable items.
 *   `data-hyui-entryheight`: Specific to `<select>`, height of each dropdown entry.
 *   `data-hyui-showlabel`: Specific to `<select>`, boolean to show or hide the label.
+*   `data-hyui-frame-width`, `data-hyui-frame-height`, `data-hyui-frame-per-row`, `data-hyui-frame-count`: Specific to `<sprite>`, defines the sprite animation frames.
+*   `data-hyui-fps`: Specific to `<sprite>`, sets the animation speed.
 
 #### Styling with CSS
 
@@ -94,6 +99,9 @@ You can include a `<style>` block at the beginning of your HYUIML:
 *   `hyui-entry-label-style`: Style reference for dropdown entry labels.
 *   `hyui-selected-entry-label-style`: Style reference for the selected dropdown entry label.
 *   `hyui-popup-style`: Style reference for the dropdown popup menu.
+*   `hyui-number-field-style`: Style reference for the number field.
+*   `hyui-checked-style`: Style reference for checkboxes when checked.
+*   `hyui-unchecked-style`: Style reference for checkboxes when unchecked.
 *   `text-align`: `top`, `bottom`, `left`, `right`, `center`, `topscrolling`, `bottomscrolling`, `middlecenter`, `centermiddle`, `leftcenterwrap`, `rightcenterwrap`, `full`, `middle`, `middlecenter`. (Note: Maps to `LayoutMode` for `<div>`).
 *   `layout-mode`, `layout`: Alternative names for `text-align` specifically for setting the `LayoutMode` on a `<div>`.
 *   `vertical-align`: `top`, `bottom`, `center`.

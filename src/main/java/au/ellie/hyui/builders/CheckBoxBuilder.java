@@ -42,6 +42,26 @@ public class CheckBoxBuilder extends UIElementBuilder<CheckBoxBuilder> {
         return this;
     }
 
+    /**
+     * Sets the style to be applied when the checkbox is in the checked state.
+     *
+     * @param checkedStyle the {@code HyUIStyle} to apply when checked
+     * @return the {@code CheckBoxBuilder} for method chaining
+     */
+    public CheckBoxBuilder withCheckedStyle(HyUIStyle checkedStyle) {
+        return withSecondaryStyle("CheckedStyle", checkedStyle);
+    }
+
+    /**
+     * Sets the style to be applied when the checkbox is in the unchecked state.
+     *
+     * @param uncheckedStyle the {@code HyUIStyle} to apply when unchecked
+     * @return the {@code CheckBoxBuilder} for method chaining
+     */
+    public CheckBoxBuilder withUncheckedStyle(HyUIStyle uncheckedStyle) {
+        return withSecondaryStyle("UncheckedStyle", uncheckedStyle);
+    }
+
     // TODO: Work out how I can set a variable within a variable given the Label for a checkbox with label has 
     //       no ID to work with.
     /*public CheckBoxBuilder withText(String text) {

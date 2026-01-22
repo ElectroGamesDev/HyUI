@@ -133,6 +133,15 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                                     <option value="Entry2">Second Entry</option>
                                     <option value="Entry3">Third Entry</option>
                                 </select>
+                                <sprite src="Common/Spinner.png"
+                                    data-hyui-frame-width="32"
+                                    data-hyui-frame-height="32"
+                                    data-hyui-frame-per-row="8"
+                                    data-hyui-frame-count="72"
+                                    data-hyui-fps="30"
+                                    style="anchor-width: 32; anchor-height: 32; anchor-right: 1;"
+                                >
+                                </sprite>
                                 <button id="btn2"><span class="item-icon" data-hyui-item-id="Tool_Pickaxe_Crude" style="anchor-width: 64; anchor-height: 64;"></span></button>
                                 <input type="reset" value="Cancel Operation" class="cancel-btn" style="font-size: 25px"/>
                             </div>

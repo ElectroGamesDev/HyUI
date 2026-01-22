@@ -32,6 +32,14 @@ public class InputHandler implements TagHandler {
                         ((NumberFieldBuilder) builder).withValue(Double.parseDouble(element.attr("value")));
                     } catch (NumberFormatException ignored) {}
                 }
+                if (element.hasAttr("format")) {
+                    ((NumberFieldBuilder) builder).withFormat(element.attr("format"));
+                }
+                if (element.hasAttr("data-hyui-max-decimal-places")) {
+                    try {
+                        ((NumberFieldBuilder) builder).withMaxDecimalPlaces(Integer.parseInt(element.attr("data-hyui-max-decimal-places")));
+                    } catch (NumberFormatException ignored) {}
+                }
                 break;
             case "range":
                 builder = SliderBuilder.gameSlider();

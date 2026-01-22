@@ -24,6 +24,8 @@ import java.util.function.Consumer;
  */
 public class NumberFieldBuilder extends UIElementBuilder<NumberFieldBuilder> {
     private Double value;
+    private String format;
+    private Integer maxDecimalPlaces;
 
     /**
      * Do not use. Instead, use the static .numberInput().
@@ -56,6 +58,38 @@ public class NumberFieldBuilder extends UIElementBuilder<NumberFieldBuilder> {
         this.value = value;
         this.initialValue = value;
         return this;
+    }
+
+    /**
+     * Sets the format string for the number field.
+     *
+     * @param format the number format string
+     * @return the current instance of {@code NumberFieldBuilder} for method chaining
+     */
+    public NumberFieldBuilder withFormat(String format) {
+        this.format = format;
+        return this;
+    }
+
+    /**
+     * Sets the maximum number of decimal places for the number field.
+     *
+     * @param maxDecimalPlaces the maximum decimal places
+     * @return the current instance of {@code NumberFieldBuilder} for method chaining
+     */
+    public NumberFieldBuilder withMaxDecimalPlaces(int maxDecimalPlaces) {
+        this.maxDecimalPlaces = maxDecimalPlaces;
+        return this;
+    }
+
+    /**
+     * Sets the style for the number field.
+     *
+     * @param style the style reference for the number field
+     * @return the current instance of {@code NumberFieldBuilder} for method chaining
+     */
+    public NumberFieldBuilder withNumberFieldStyle(HyUIStyle style) {
+        return withSecondaryStyle("NumberFieldStyle", style);
     }
 
     /**
@@ -110,6 +144,14 @@ public class NumberFieldBuilder extends UIElementBuilder<NumberFieldBuilder> {
         if (value != null) {
             HyUIPlugin.getLog().logInfo("Setting Value: " + value + " for " + selector);
             commands.set(selector + ".Value", value);
+        }
+
+        if (format != null) {
+            commands.set(selector + ".Format", format);
+        }
+
+        if (maxDecimalPlaces != null) {
+            commands.set(selector + ".MaxDecimalPlaces", maxDecimalPlaces);
         }
 
         if (hyUIStyle == null && style != null) {

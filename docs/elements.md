@@ -120,3 +120,31 @@ ButtonBuilder.textButton()
     )
     .open(playerRef, store);
 ```
+
+### Sprite Example
+
+A `Sprite` displays an animated sequence of frames from a spritemap texture.
+
+#### HYUIML Example
+
+```html
+<sprite src="Common/Spinner.png" 
+        data-hyui-frame-width="32" 
+        data-hyui-frame-height="32" 
+        data-hyui-frame-per-row="8" 
+        data-hyui-frame-count="72" 
+        data-hyui-fps="30" 
+        style="anchor-width: 32; anchor-height: 32;">
+</sprite>
+```
+
+#### Java Builder Example
+
+```java
+SpriteBuilder.sprite()
+    .withTexture("Common/Spinner.png")
+    .withFrame(32, 32, 8, 72) // Width, Height, PerRow, Count
+    .withFramesPerSecond(30)
+    .withAnchor(new HyUIAnchor().setWidth(32).setHeight(32))
+    .open(playerRef, store);
+```

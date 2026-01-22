@@ -32,6 +32,10 @@ public class ButtonHandler implements TagHandler {
             builder = ButtonBuilder.cancelTextButton();
         } else if (tag.equals("button") && element.hasClass("back-button")) {
             builder = ButtonBuilder.backButton();
+        } else if (tag.equals("button") && element.hasClass("secondary-button")) {
+            builder = ButtonBuilder.secondaryTextButton();
+        } else if (tag.equals("button") && element.hasClass("tertiary-button")) {
+            builder = ButtonBuilder.tertiaryTextButton();
         } else if (hasItemIcon) {
             builder = ButtonBuilder.rawButton();
         } else {

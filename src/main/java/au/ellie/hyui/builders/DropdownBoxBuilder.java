@@ -143,25 +143,30 @@ public class DropdownBoxBuilder extends UIElementBuilder<DropdownBoxBuilder> {
         if (selector == null) return;
 
         if (value != null) {
+            HyUIPlugin.getLog().logInfo("Setting Value: " + value + " for " + selector);
             commands.set(selector + ".Value", value);
         }
         if (allowUnselection != null) {
+            HyUIPlugin.getLog().logInfo("Setting AllowUnselection: " + allowUnselection + " for " + selector);
             commands.set(selector + ".AllowUnselection", allowUnselection);
         }
         if (maxSelection != null) {
+            HyUIPlugin.getLog().logInfo("Setting MaxSelection: " + maxSelection + " for " + selector);
             commands.set(selector + ".MaxSelection", maxSelection);
         }
         if (entryHeight != null) {
+            HyUIPlugin.getLog().logInfo("Setting EntryHeight: " + entryHeight + " for " + selector);
             commands.set(selector + ".EntryHeight", entryHeight);
         }
         if (showLabel != null) {
+            HyUIPlugin.getLog().logInfo("Setting ShowLabel: " + showLabel + " for " + selector);
             commands.set(selector + ".ShowLabel", showLabel);
         }
         if (!entries.isEmpty()) {
+            HyUIPlugin.getLog().logInfo("Setting Entries for " + selector);
             commands.set(selector + ".Entries", entries);
         }
 
-        // TODO: Verify this actually works.
         listeners.forEach(listener -> {
             if (listener.type() == CustomUIEventBindingType.ValueChanged) {
                 String eventId = getEffectiveId();

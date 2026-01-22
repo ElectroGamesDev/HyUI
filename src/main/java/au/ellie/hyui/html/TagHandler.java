@@ -291,6 +291,15 @@ public interface TagHandler {
                 case "hyui-popup-style":
                     builder.withSecondaryStyle("PopupStyle", parseStyleReference(value));
                     break;
+                case "hyui-number-field-style":
+                    builder.withSecondaryStyle("NumberFieldStyle", parseStyleReference(value));
+                    break;
+                case "hyui-checked-style":
+                    builder.withSecondaryStyle("CheckedStyle", parseStyleReference(value));
+                    break;
+                case "hyui-unchecked-style":
+                    builder.withSecondaryStyle("UncheckedStyle", parseStyleReference(value));
+                    break;
             }
         }
 

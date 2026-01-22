@@ -13,11 +13,14 @@ public class UIElements {
     public static final String PROGRESS_BAR = "ProgressBar";
     public static final String ITEM_ICON = "ItemIcon";
     public static final String DROPDOWN_BOX = "DropdownBox";
+    public static final String SPRITE = "Sprite";
 
     // Macros (Common.ui)
     public static final String PAGE_OVERLAY = "PageOverlay";
     public static final String CONTAINER = "Container";
     public static final String TEXT_BUTTON = "TextButton";
+    public static final String SECONDARY_TEXT_BUTTON = "SecondaryTextButton";
+    public static final String TERTIARY_TEXT_BUTTON = "TertiaryTextButton";
     public static final String CANCEL_TEXT_BUTTON = "CancelTextButton";
     public static final String CHECK_BOX_WITH_LABEL = "CheckBoxWithLabel";
     public static final String MACRO_TEXT_FIELD = "TextField";
@@ -28,11 +31,11 @@ public class UIElements {
     public static final String ITEM_ICON_MACRO = "ItemIcon";
 
     public static final Set<String> NORMAL_ELEMENTS = Set.of(
-            GROUP, LABEL, COLOR_PICKER, BUTTON, TEXT_FIELD, "Input", "CheckBox", "Slider", "ItemSlot", "Text", PROGRESS_BAR, ITEM_ICON
+            GROUP, LABEL, COLOR_PICKER, BUTTON, TEXT_FIELD, "Input", "CheckBox", "Slider", "ItemSlot", "Text", PROGRESS_BAR, ITEM_ICON, SPRITE
     );
 
     public static final Set<String> MACRO_ELEMENTS = Set.of(
-            PAGE_OVERLAY, CONTAINER, TEXT_BUTTON, CANCEL_TEXT_BUTTON, CHECK_BOX_WITH_LABEL, MACRO_TEXT_FIELD, MACRO_NUMBER_FIELD, BACK_BUTTON, ASSET_IMAGE, "Title", SLIDER
+            PAGE_OVERLAY, CONTAINER, TEXT_BUTTON, SECONDARY_TEXT_BUTTON, TERTIARY_TEXT_BUTTON, CANCEL_TEXT_BUTTON, CHECK_BOX_WITH_LABEL, MACRO_TEXT_FIELD, MACRO_NUMBER_FIELD, BACK_BUTTON, ASSET_IMAGE, "Title", SLIDER
     );
 
     private UIElements() {}
