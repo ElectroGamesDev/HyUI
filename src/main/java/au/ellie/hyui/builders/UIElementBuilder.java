@@ -12,7 +12,9 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -44,6 +46,7 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
     protected Integer flexWeight;
     protected final List<BiConsumer<UICommandBuilder, String>> editAfterCallbacks = new ArrayList<>();
     protected final List<BiConsumer<UICommandBuilder, String>> editBeforeCallbacks = new ArrayList<>();
+    protected final Map<String, HyUIStyle> secondaryStyles = new HashMap<>();
 
     private static int idCounter = 0;
 
@@ -114,6 +117,14 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
 
     public static void resetIdCounter() {
         idCounter = 0;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T withSecondaryStyle(String property, HyUIStyle style) {
+        if (style != null) {
+            this.secondaryStyles.put(property, style);
+        }
+        return (T) this;
     }
 
     /**
@@ -388,6 +399,12 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
                 applyStyle(commands, selector + ".Style", hyUIStyle, doc);
                 PropertyBatcher.endSet(selector + ".Style", doc, commands);
             }
+
+            secondaryStyles.forEach((property, style) -> {
+                BsonDocumentHelper doc = PropertyBatcher.beginSet();
+                applyStyle(commands, selector + "." + property, style, doc);
+                PropertyBatcher.endSet(selector + "." + property, doc, commands);
+            });
         }
     }
 
@@ -459,6 +476,12 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
      * @param style An instance of HyUIStyle containing the properties to be applied to the command builder.
      */
     protected void applyStyle(UICommandBuilder commands, String prefix, HyUIStyle style, BsonDocumentHelper doc) {
+        if (style.getStyleReference() != null) {
+            HyUIPlugin.getLog().logInfo("Applying style reference: " + style.getStyleDocument() + " -> " + style.getStyleReference() + " to " + prefix);
+            commands.set(prefix, com.hypixel.hytale.server.core.ui.Value.ref(style.getStyleDocument(), style.getStyleReference()));
+            return;
+        }
+
         Set<String> unsupported = getUnsupportedStyleProperties();
         
         if (style.getFontSize() != null && !unsupported.contains("FontSize")) {

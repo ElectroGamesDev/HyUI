@@ -15,6 +15,8 @@ public class HyUIStyle {
     private Alignment horizontalAlignment;
     private Alignment verticalAlignment;
     private Alignment alignment;
+    private String styleReference;
+    private String styleDocument = "Common.ui";
     private final Map<String, HyUIStyle> states = new HashMap<>();
     private final Map<String, Object> rawProperties = new HashMap<>();
 
@@ -91,6 +93,17 @@ public class HyUIStyle {
         return this;
     }
 
+    public HyUIStyle withStyleReference(String reference) {
+        this.styleReference = reference;
+        return this;
+    }
+
+    public HyUIStyle withStyleReference(String document, String reference) {
+        this.styleDocument = document;
+        this.styleReference = reference;
+        return this;
+    }
+
     public HyUIStyle setDisabledStyle(HyUIStyle style) {
         states.put("Disabled", style);
         return this;
@@ -132,6 +145,14 @@ public class HyUIStyle {
 
     public Alignment getAlignment() {
         return alignment;
+    }
+
+    public String getStyleReference() {
+        return styleReference;
+    }
+
+    public String getStyleDocument() {
+        return styleDocument;
     }
 
     public Map<String, HyUIStyle> getStates() {

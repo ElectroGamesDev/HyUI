@@ -77,6 +77,33 @@ public class DropdownBoxBuilder extends UIElementBuilder<DropdownBoxBuilder> {
         return this;
     }
 
+    /**
+     * Sets the style for the entry labels in the dropdown.
+     * @param style The style reference for entry labels.
+     * @return This builder instance for method chaining.
+     */
+    public DropdownBoxBuilder withEntryLabelStyle(HyUIStyle style) {
+        return withSecondaryStyle("EntryLabelStyle", style);
+    }
+
+    /**
+     * Sets the style for the selected entry label in the dropdown.
+     * @param style The style reference for the selected entry label.
+     * @return This builder instance for method chaining.
+     */
+    public DropdownBoxBuilder withSelectedEntryLabelStyle(HyUIStyle style) {
+        return withSecondaryStyle("SelectedEntryLabelStyle", style);
+    }
+
+    /**
+     * Sets the style for the popup menu of the dropdown.
+     * @param style The style reference for the popup menu.
+     * @return This builder instance for method chaining.
+     */
+    public DropdownBoxBuilder withPopupStyle(HyUIStyle style) {
+        return withSecondaryStyle("PopupStyle", style);
+    }
+
     public DropdownBoxBuilder withEntries(java.util.List<DropdownEntryInfo> entries) {
         this.entries = new java.util.ArrayList<>(entries);
         return this;

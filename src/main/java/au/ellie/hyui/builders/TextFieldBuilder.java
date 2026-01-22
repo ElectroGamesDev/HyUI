@@ -19,7 +19,6 @@ import java.util.function.Consumer;
 public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder> {
     private String value;
     private String placeholderText;
-    private String placeholderStyle;
     private Integer maxLength;
     private Integer maxVisibleLines;
     private Boolean readOnly;
@@ -29,7 +28,7 @@ public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder> {
 
     /**
      * DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING.
-     * 
+     *
      * Not normally used, only used when creating a text field element from scratch.
      */
     public TextFieldBuilder() {
@@ -39,7 +38,7 @@ public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder> {
 
     /**
      * DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING.
-     * 
+     *
      * Constructor for creating a text field element with a specified theme.
      * @param theme The theme to use for the text field element.
      */
@@ -53,7 +52,7 @@ public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder> {
 
     /**
      * DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING.
-     * 
+     *
      * Constructor for creating a text field element with a specified theme and element path.
      * @param theme The theme to use for the text field element.
      * @param elementPath The path to the UI element definition file.
@@ -100,9 +99,8 @@ public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder> {
      * @param placeholderStyle The style reference for the placeholder text.
      * @return This TextFieldBuilder instance for method chaining.
      */
-    public TextFieldBuilder withPlaceholderStyle(String placeholderStyle) {
-        this.placeholderStyle = placeholderStyle;
-        return this;
+    public TextFieldBuilder withPlaceholderStyle(HyUIStyle placeholderStyle) {
+        return withSecondaryStyle("PlaceholderStyle", placeholderStyle);
     }
 
     /**
@@ -188,7 +186,7 @@ public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder> {
     public TextFieldBuilder addEventListener(CustomUIEventBindingType type, BiConsumer<String, UIContext> callback) {
         return addEventListenerWithContext(type, String.class, callback);
     }
-    
+
     @Override
     protected boolean usesRefValue() {
         return true;
@@ -198,7 +196,7 @@ public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder> {
     protected boolean supportsStyling() {
         return true;
     }
-    
+
     @Override
     protected void onBuild(UICommandBuilder commands, UIEventBuilder events) {
         String selector = getSelector();
@@ -212,11 +210,7 @@ public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder> {
         if (placeholderText != null) {
             commands.set(selector + ".PlaceholderText", placeholderText);
         }
-
-        if (placeholderStyle != null) {
-            commands.set(selector + ".PlaceholderStyle", placeholderStyle);
-        }
-
+        
         if (maxLength != null) {
             commands.set(selector + ".MaxLength", maxLength);
         }
@@ -250,10 +244,10 @@ public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder> {
             if (listener.type() == CustomUIEventBindingType.ValueChanged) {
                 String eventId = getEffectiveId();
                 HyUIPlugin.getLog().logInfo("Adding ValueChanged event binding for " + selector + " with eventId: " + eventId);
-                events.addEventBinding(CustomUIEventBindingType.ValueChanged, selector, 
+                events.addEventBinding(CustomUIEventBindingType.ValueChanged, selector,
                         EventData.of("@Value", selector + ".Value")
-                            .append("Target", eventId)
-                            .append("Action", UIEventActions.VALUE_CHANGED), 
+                                .append("Target", eventId)
+                                .append("Action", UIEventActions.VALUE_CHANGED),
                         false);
             }
         });

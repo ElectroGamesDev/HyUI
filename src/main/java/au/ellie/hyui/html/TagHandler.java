@@ -269,6 +269,28 @@ public interface TagHandler {
                         }
                     }
                     break;
+                case "hyui-style-reference":
+                    String[] styleParts = value.split("\\s+");
+                    if (styleParts.length == 1) {
+                        hyStyle.withStyleReference(styleParts[0].replace("\"", "").replace("'", ""));
+                        hasStyle = true;
+                    } else if (styleParts.length >= 2) {
+                        hyStyle.withStyleReference(
+                                styleParts[0].replace("\"", "").replace("'", ""),
+                                styleParts[1].replace("\"", "").replace("'", "")
+                        );
+                        hasStyle = true;
+                    }
+                    break;
+                case "hyui-entry-label-style":
+                    builder.withSecondaryStyle("EntryLabelStyle", parseStyleReference(value));
+                    break;
+                case "hyui-selected-entry-label-style":
+                    builder.withSecondaryStyle("SelectedEntryLabelStyle", parseStyleReference(value));
+                    break;
+                case "hyui-popup-style":
+                    builder.withSecondaryStyle("PopupStyle", parseStyleReference(value));
+                    break;
             }
         }
 
@@ -281,6 +303,20 @@ public interface TagHandler {
         if (hasPadding) {
             builder.withPadding(padding);
         }
+    }
+
+    private HyUIStyle parseStyleReference(String value) {
+        HyUIStyle style = new HyUIStyle();
+        String[] parts = value.split("\\s+");
+        if (parts.length == 1) {
+            style.withStyleReference(parts[0].replace("\"", "").replace("'", ""));
+        } else if (parts.length >= 2) {
+            style.withStyleReference(
+                    parts[0].replace("\"", "").replace("'", ""),
+                    parts[1].replace("\"", "").replace("'", "")
+            );
+        }
+        return style;
     }
 
     private String capitalize(String str) {

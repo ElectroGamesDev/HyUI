@@ -90,6 +90,10 @@ You can include a `<style>` block at the beginning of your HYUIML:
 *   `font-size`: Numeric value.
 *   `font-weight`: `bold` or `normal`.
 *   `text-transform`: `uppercase` or `none`.
+*   `hyui-style-reference`: Applies a style reference from a UI document (e.g., `hyui-style-reference: "Common.ui" "DefaultLabelStyle"`). Note that if this is used, other styling properties in the same block may be ignored.
+*   `hyui-entry-label-style`: Style reference for dropdown entry labels.
+*   `hyui-selected-entry-label-style`: Style reference for the selected dropdown entry label.
+*   `hyui-popup-style`: Style reference for the dropdown popup menu.
 *   `text-align`: `top`, `bottom`, `left`, `right`, `center`, `topscrolling`, `bottomscrolling`, `middlecenter`, `centermiddle`, `leftcenterwrap`, `rightcenterwrap`, `full`, `middle`, `middlecenter`. (Note: Maps to `LayoutMode` for `<div>`).
 *   `layout-mode`, `layout`: Alternative names for `text-align` specifically for setting the `LayoutMode` on a `<div>`.
 *   `vertical-align`: `top`, `bottom`, `center`.

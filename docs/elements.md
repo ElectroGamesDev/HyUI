@@ -31,6 +31,24 @@ DropdownBoxBuilder.dropdownBox()
     });
 ```
 
+#### Dropdown Styling
+
+The `DropdownBoxBuilder` supports additional secondary styles for detailed customization:
+
+- `withEntryLabelStyle(HyUIStyle)`: Sets the style for the entry labels in the dropdown.
+- `withSelectedEntryLabelStyle(HyUIStyle)`: Sets the style for the currently selected entry's label.
+- `withPopupStyle(HyUIStyle)`: Sets the style for the popup menu container.
+
+In HYUIML, these can be set via CSS:
+
+```css
+#myDropdown {
+    hyui-entry-label-style: "Common.ui" "DefaultLabelStyle";
+    hyui-selected-entry-label-style: "Common.ui" "SelectedLabelStyle";
+    hyui-popup-style: "Common.ui" "DefaultPopupStyle";
+}
+```
+
 > **Warning**: The value passed to `.withValue(String)` MUST exist within the entries added to the dropdown (via `.addEntry` or `.withEntries`). If it doesn't, the dropdown may fail to display correctly.
 
 ### Item Icon Button Example
