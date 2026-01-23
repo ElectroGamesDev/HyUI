@@ -36,7 +36,7 @@ public class TabNavigationHandler implements TagHandler {
     public boolean canHandle(Element element) {
         String tagName = element.tagName().toLowerCase();
         return (tagName.equals("nav") || tagName.equals("div")) &&
-                (element.hasClass("tabs") || element.hasClass("tab-navigation"));
+               (element.hasClass("tabs") || element.hasClass("tab-navigation"));
     }
 
     @Override

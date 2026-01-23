@@ -61,13 +61,6 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
     /**
      * Loads and processes an HTML template with a map of variables.
      *
-     * <p>Example usage:</p>
-     * <pre>
-     * builder.fromTemplate("""
-     *     &lt;p&gt;Hello, {{$playerName}}!&lt;/p&gt;
-     *     """, Map.of("playerName", player.getName()));
-     * </pre>
-     *
      * @param html      The HTML template with {{$variable}} placeholders
      * @param variables Map of variable names to values
      * @return This builder instance for method chaining
@@ -75,7 +68,7 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
     public T fromTemplate(String html, Map<String, ?> variables) {
         return fromTemplate(html, new TemplateProcessor().setVariables(variables));
     }
-    
+
     public T addElement(UIElementBuilder<?> element) {
         element.inside("#HyUIRoot");
         registerElement(element);
