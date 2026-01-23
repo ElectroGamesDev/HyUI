@@ -146,17 +146,9 @@ public class NumberFieldBuilder extends UIElementBuilder<NumberFieldBuilder> {
             commands.set(selector + ".Value", value);
         }
 
-        // Build Format string - MaxDecimalPlaces goes inside Format, not as separate property
-        // Hytale syntax: Format: (MaxDecimalPlaces:2,Step:0.5)
-        if (format != null || maxDecimalPlaces != null) {
-            String formatValue = format;
-            if (formatValue == null && maxDecimalPlaces != null) {
-                formatValue = "(MaxDecimalPlaces:" + maxDecimalPlaces + ")";
-            }
-            if (formatValue != null) {
-                commands.set(selector + ".Format", formatValue);
-            }
-        }
+        // NOTE: Format cannot be set via commands.set() - Hytale expects NumberFieldFormat type, not String
+        // MaxDecimalPlaces must be defined inline in the .ui template file
+        // See: https://github.com/underscore95/hytale-ui-docs/blob/main/docs/UIElements/-C--NumberField.md
 
         if (hyUIStyle == null && style != null) {
             HyUIPlugin.getLog().logInfo("Setting Style: " + style + " for " + selector);

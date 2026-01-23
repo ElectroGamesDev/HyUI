@@ -5,14 +5,8 @@ plugins {
 }
 
 ext {
-    def userHome = System.getProperty("user.home")
-    def os = System.getProperty("os.name").toLowerCase()
-    if (os.contains("win")) {
-        hytaleHome = "${userHome}/AppData/Roaming/Hytale"
-    } else {
-        // Assume we are on Linux, we love Linux flatpaks here.
-        hytaleHome = "${userHome}/.var/app/com.hypixel.HytaleLauncher/data/Hytale"
-    }
+    // Override: use C:/Games/Hytale instead of default AppData location
+    hytaleHome = "C:/Games/Hytale"
 }
 
 java {
