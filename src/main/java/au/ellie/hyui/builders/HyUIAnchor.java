@@ -15,7 +15,6 @@ public class HyUIAnchor {
     private int width = -1;
     private int minWidth = -1;
     private int maxWidth = -1;
-
     public HyUIAnchor() {
     }
 

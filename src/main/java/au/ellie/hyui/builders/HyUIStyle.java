@@ -1,5 +1,7 @@
 package au.ellie.hyui.builders;
 
+import au.ellie.hyui.utils.ParseUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,9 +33,8 @@ public class HyUIStyle {
     }
 
     public HyUIStyle setFontSize(String fontSize) {
-        try {
-            this.fontSize = Float.parseFloat(fontSize);
-        } catch (NumberFormatException ignored) {}
+        ParseUtils.parseFloat(fontSize)
+                .ifPresent(v -> this.fontSize = v);
         return this;
     }
 
@@ -113,9 +114,8 @@ public class HyUIStyle {
     }
 
     public HyUIStyle setHorizontalAlignment(String horizontalAlignment) {
-        try {
-            this.horizontalAlignment = Alignment.valueOf(horizontalAlignment);
-        } catch (IllegalArgumentException ignored) {}
+        ParseUtils.parseEnum(horizontalAlignment, Alignment.class)
+                .ifPresent(v -> this.horizontalAlignment = v);
         return this;
     }
 
@@ -125,9 +125,8 @@ public class HyUIStyle {
     }
 
     public HyUIStyle setVerticalAlignment(String verticalAlignment) {
-        try {
-            this.verticalAlignment = Alignment.valueOf(verticalAlignment);
-        } catch (IllegalArgumentException ignored) {}
+        ParseUtils.parseEnum(verticalAlignment, Alignment.class)
+                .ifPresent(v -> this.verticalAlignment = v);
         return this;
     }
 
@@ -137,9 +136,8 @@ public class HyUIStyle {
     }
 
     public HyUIStyle setAlignment(String alignment) {
-        try {
-            this.alignment = Alignment.valueOf(alignment);
-        } catch (IllegalArgumentException ignored) {}
+        ParseUtils.parseEnum(alignment, Alignment.class)
+                .ifPresent(v -> this.alignment = v);
         return this;
     }
 

@@ -4,6 +4,7 @@ import au.ellie.hyui.HyUIPlugin;
 import au.ellie.hyui.builders.*;
 import au.ellie.hyui.elements.BackgroundSupported;
 import au.ellie.hyui.elements.LayoutModeSupported;
+import au.ellie.hyui.utils.ParseUtils;
 import au.ellie.hyui.utils.StyleUtils;
 import com.hypixel.hytale.server.core.Message;
 import org.jsoup.nodes.Element;
@@ -79,16 +80,18 @@ public interface TagHandler {
             }
             boolean hasImgAttr = false;
             if (element.hasAttr("width")) {
-                try {
-                    anchor.setWidth(Integer.parseInt(element.attr("width")));
+                var width = ParseUtils.parseInt(element.attr("width"));
+                if (width.isPresent()) {
+                    anchor.setWidth(width.get());
                     hasImgAttr = true;
-                } catch (NumberFormatException ignored) {}
+                }
             }
             if (element.hasAttr("height")) {
-                try {
-                    anchor.setHeight(Integer.parseInt(element.attr("height")));
+                var height = ParseUtils.parseInt(element.attr("height"));
+                if (height.isPresent()) {
+                    anchor.setHeight(height.get());
                     hasImgAttr = true;
-                } catch (NumberFormatException ignored) {}
+                }
             }
             if (hasImgAttr) {
                 builder.withAnchor(anchor);
@@ -199,6 +202,44 @@ public interface TagHandler {
                         ((LayoutModeSupported<?>) builder).withLayoutMode(normalizeLayoutMode(value));
                     }
                     break;
+                case "flex-direction":
+                    // Map CSS flex-direction to Hytale LayoutMode
+                    // row = Left (horizontal), column = Top (vertical)
+                    if (builder instanceof LayoutModeSupported) {
+                        String layoutMode = switch (value.toLowerCase()) {
+                            case "row" -> "Left";
+                            case "row-reverse" -> "Right";
+                            case "column" -> "Top";
+                            case "column-reverse" -> "Bottom";
+                            default -> capitalize(value);
+                        };
+                        ((LayoutModeSupported<?>) builder).withLayoutMode(layoutMode);
+                    }
+                    break;
+                case "justify-content":
+                    // Map CSS justify-content to horizontal alignment
+                    String hAlign = switch (value.toLowerCase()) {
+                        case "flex-start", "start" -> "Left";
+                        case "flex-end", "end" -> "Right";
+                        case "center" -> "Center";
+                        case "space-between", "space-around", "space-evenly" -> "Center"; // approximation
+                        default -> capitalize(value);
+                    };
+                    parsed.style.setHorizontalAlignment(hAlign);
+                    parsed.hasStyle = true;
+                    break;
+                case "align-items":
+                    // Map CSS align-items to vertical alignment
+                    String vAlign = switch (value.toLowerCase()) {
+                        case "flex-start", "start" -> "Start";
+                        case "flex-end", "end" -> "End";
+                        case "center" -> "Center";
+                        case "stretch", "baseline" -> "Center"; // approximation
+                        default -> capitalize(value);
+                    };
+                    parsed.style.setVerticalAlignment(vAlign);
+                    parsed.hasStyle = true;
+                    break;
                 case "vertical-align":
                     parsed.style.setVerticalAlignment(capitalize(value));
                     parsed.hasStyle = true;
@@ -226,113 +267,114 @@ public interface TagHandler {
                     }
                     break;
                 case "flex-weight":
-                    try {
-                        builder.withFlexWeight(Integer.parseInt(value));
-                    } catch (NumberFormatException ignored) {}
+                    ParseUtils.parseInt(value)
+                            .ifPresent(builder::withFlexWeight);
                     break;
                 case "anchor-left":
-                    try {
-                        parsed.anchor.setLeft(Integer.parseInt(value));
+                    ParseUtils.parseInt(value).ifPresent(v -> {
+                        parsed.anchor.setLeft(v);
                         parsed.hasAnchor = true;
-                    } catch (NumberFormatException ignored) {}
+                    });
                     break;
                 case "anchor-right":
-                    try {
-                        parsed.anchor.setRight(Integer.parseInt(value));
+                    ParseUtils.parseInt(value).ifPresent(v -> {
+                        parsed.anchor.setRight(v);
                         parsed.hasAnchor = true;
-                    } catch (NumberFormatException ignored) {}
+                    });
                     break;
                 case "anchor-top":
-                    try {
-                        parsed.anchor.setTop(Integer.parseInt(value));
+                    ParseUtils.parseInt(value).ifPresent(v -> {
+                        parsed.anchor.setTop(v);
                         parsed.hasAnchor = true;
-                    } catch (NumberFormatException ignored) {}
+                    });
                     break;
                 case "anchor-bottom":
-                    try {
-                        parsed.anchor.setBottom(Integer.parseInt(value));
+                    ParseUtils.parseInt(value).ifPresent(v -> {
+                        parsed.anchor.setBottom(v);
                         parsed.hasAnchor = true;
-                    } catch (NumberFormatException ignored) {}
+                    });
                     break;
                 case "anchor-width":
-                    try {
-                        parsed.anchor.setWidth(Integer.parseInt(value));
+                    ParseUtils.parseInt(value).ifPresent(v -> {
+                        parsed.anchor.setWidth(v);
                         parsed.hasAnchor = true;
-                    } catch (NumberFormatException ignored) {}
+                    });
                     break;
                 case "anchor-height":
-                    try {
-                        parsed.anchor.setHeight(Integer.parseInt(value));
+                    ParseUtils.parseInt(value).ifPresent(v -> {
+                        parsed.anchor.setHeight(v);
                         parsed.hasAnchor = true;
-                    } catch (NumberFormatException ignored) {}
+                    });
                     break;
                 case "anchor-full", "anchor":
-                    try {
-                        parsed.anchor.setFull(Integer.parseInt(value));
+                    ParseUtils.parseInt(value).ifPresent(v -> {
+                        parsed.anchor.setFull(v);
                         parsed.hasAnchor = true;
-                    } catch (NumberFormatException ignored) {}
+                    });
                     break;
                 case "anchor-horizontal":
-                    try {
-                        parsed.anchor.setHorizontal(Integer.parseInt(value));
+                    ParseUtils.parseInt(value).ifPresent(v -> {
+                        parsed.anchor.setHorizontal(v);
                         parsed.hasAnchor = true;
-                    } catch (NumberFormatException ignored) {}
+                    });
                     break;
                 case "anchor-vertical":
-                    try {
-                        parsed.anchor.setVertical(Integer.parseInt(value));
+                    ParseUtils.parseInt(value).ifPresent(v -> {
+                        parsed.anchor.setVertical(v);
                         parsed.hasAnchor = true;
-                    } catch (NumberFormatException ignored) {}
+                    });
                     break;
                 case "anchor-min-width":
-                    try {
-                        parsed.anchor.setMinWidth(Integer.parseInt(value));
+                    ParseUtils.parseInt(value).ifPresent(v -> {
+                        parsed.anchor.setMinWidth(v);
                         parsed.hasAnchor = true;
-                    } catch (NumberFormatException ignored) {}
+                    });
                     break;
                 case "anchor-max-width":
-                    try {
-                        parsed.anchor.setMaxWidth(Integer.parseInt(value));
+                    ParseUtils.parseInt(value).ifPresent(v -> {
+                        parsed.anchor.setMaxWidth(v);
                         parsed.hasAnchor = true;
-                    } catch (NumberFormatException ignored) {}
+                    });
                     break;
                 case "padding-left":
-                    try {
-                        parsed.padding.setLeft(Integer.parseInt(value));
+                    ParseUtils.parseInt(value).ifPresent(v -> {
+                        parsed.padding.setLeft(v);
                         parsed.hasPadding = true;
-                    } catch (NumberFormatException ignored) {}
+                    });
                     break;
                 case "padding-right":
-                    try {
-                        parsed.padding.setRight(Integer.parseInt(value));
+                    ParseUtils.parseInt(value).ifPresent(v -> {
+                        parsed.padding.setRight(v);
                         parsed.hasPadding = true;
-                    } catch (NumberFormatException ignored) {}
+                    });
                     break;
                 case "padding-top":
-                    try {
-                        parsed.padding.setTop(Integer.parseInt(value));
+                    ParseUtils.parseInt(value).ifPresent(v -> {
+                        parsed.padding.setTop(v);
                         parsed.hasPadding = true;
-                    } catch (NumberFormatException ignored) {}
+                    });
                     break;
                 case "padding-bottom":
-                    try {
-                        parsed.padding.setBottom(Integer.parseInt(value));
+                    ParseUtils.parseInt(value).ifPresent(v -> {
+                        parsed.padding.setBottom(v);
                         parsed.hasPadding = true;
-                    } catch (NumberFormatException ignored) {}
+                    });
                     break;
                 case "padding":
-                    String[] values = value.split("\\s+");
-                    try {
-                        if (values.length == 1) {
-                            parsed.padding.setFull(Integer.parseInt(values[0]));
+                    String[] paddingValues = value.split("\\s+");
+                    if (paddingValues.length == 1) {
+                        ParseUtils.parseInt(paddingValues[0]).ifPresent(v -> {
+                            parsed.padding.setFull(v);
                             parsed.hasPadding = true;
-                        } else if (values.length >= 2) {
-                            int v = Integer.parseInt(values[0]);
-                            int h = Integer.parseInt(values[1]);
-                            parsed.padding.setSymmetric(v, h);
+                        });
+                    } else if (paddingValues.length >= 2) {
+                        var vertical = ParseUtils.parseInt(paddingValues[0]);
+                        var horizontal = ParseUtils.parseInt(paddingValues[1]);
+                        if (vertical.isPresent() && horizontal.isPresent()) {
+                            parsed.padding.setSymmetric(vertical.get(), horizontal.get());
                             parsed.hasPadding = true;
                         }
-                    } catch (NumberFormatException ignored) {}
+                    }
                     break;
                 case "background-image":
                     if (builder instanceof BackgroundSupported) {

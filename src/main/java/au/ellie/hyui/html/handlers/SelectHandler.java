@@ -4,6 +4,7 @@ import au.ellie.hyui.builders.DropdownBoxBuilder;
 import au.ellie.hyui.builders.UIElementBuilder;
 import au.ellie.hyui.html.HtmlParser;
 import au.ellie.hyui.html.TagHandler;
+import au.ellie.hyui.utils.ParseUtils;
 import org.jsoup.nodes.Element;
 
 public class SelectHandler implements TagHandler {
@@ -25,15 +26,13 @@ public class SelectHandler implements TagHandler {
         }
         
         if (element.hasAttr("data-hyui-maxselection")) {
-            try {
-                builder.withMaxSelection(Integer.parseInt(element.attr("data-hyui-maxselection")));
-            } catch (NumberFormatException ignored) {}
+            ParseUtils.parseInt(element.attr("data-hyui-maxselection"))
+                    .ifPresent(builder::withMaxSelection);
         }
         
         if (element.hasAttr("data-hyui-entryheight")) {
-            try {
-                builder.withEntryHeight(Integer.parseInt(element.attr("data-hyui-entryheight")));
-            } catch (NumberFormatException ignored) {}
+            ParseUtils.parseInt(element.attr("data-hyui-entryheight"))
+                    .ifPresent(builder::withEntryHeight);
         }
         
         if (element.hasAttr("data-hyui-showlabel")) {

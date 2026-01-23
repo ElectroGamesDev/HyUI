@@ -5,6 +5,7 @@ import au.ellie.hyui.elements.BackgroundSupported;
 import au.ellie.hyui.elements.LayoutModeSupported;
 import au.ellie.hyui.elements.UIElements;
 import au.ellie.hyui.theme.Theme;
+import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 
@@ -16,14 +17,12 @@ import java.util.List;
  * Creates a horizontal row of tab buttons for navigation between different content sections.
  *
  * Example usage:
- * <pre>
  * TabNavigationBuilder.tabNavigation()
  *     .withId("main-tabs")
  *     .addTab("inventory", "Inventory")
  *     .addTab("stats", "Statistics")
  *     .addTab("settings", "Settings")
  *     .withSelectedTab("inventory")
- * </pre>
  */
 public class TabNavigationBuilder extends UIElementBuilder<TabNavigationBuilder>
         implements LayoutModeSupported<TabNavigationBuilder>, BackgroundSupported<TabNavigationBuilder> {
@@ -36,7 +35,7 @@ public class TabNavigationBuilder extends UIElementBuilder<TabNavigationBuilder>
 
     private final List<Tab> tabs = new ArrayList<>();
     private String selectedTabId;
-    private String layoutMode = "Left"; // Horizontal by default
+    private String layoutMode = "Left";
     private HyUIPatchStyle background;
     private HyUIStyle selectedTabStyle;
     private HyUIStyle unselectedTabStyle;
@@ -151,7 +150,7 @@ public class TabNavigationBuilder extends UIElementBuilder<TabNavigationBuilder>
         applyLayoutMode(commands, selector);
         applyBackground(commands, selector);
 
-        // Only create tab buttons once (guard against multiple builds)
+        // Only create tab buttons once, we're dealing with builders here, not raw set commands.
         if (tabButtonsCreated) return;
         tabButtonsCreated = true;
 
@@ -160,16 +159,27 @@ public class TabNavigationBuilder extends UIElementBuilder<TabNavigationBuilder>
             Tab tab = tabs.get(i);
             boolean isSelected = tab.id().equals(selectedTabId);
 
-            ButtonBuilder tabButton = ButtonBuilder.textButton()
+            ButtonBuilder tabButton = ButtonBuilder.secondaryTextButton()
                     .withId(tab.id())
                     .withText(tab.label())
+                    .addEventListener(CustomUIEventBindingType.Activating, (_, ctx) -> {
+                        ctx.getById(tab.id(), ButtonBuilder.class).ifPresent(button -> {
+                            this.withSelectedTab(tab.id());
+                            button.withStyle(this.selectedTabStyle != null ? 
+                                    this.selectedTabStyle 
+                                    : TabNavigationBuilder.defaultSelectedStyle());
+                            // TODO: show only the element linked to this tab.
+                            //  Need to add to the .addTab(id, label, <tabContentsId>)?
+                            ctx.updatePage(true);
+                        });
+                    })
                     .withFlexWeight(1);
 
             // Apply selected/unselected styling
-            if (isSelected && selectedTabStyle != null) {
-                tabButton.withStyle(selectedTabStyle);
-            } else if (!isSelected && unselectedTabStyle != null) {
-                tabButton.withStyle(unselectedTabStyle);
+            if (isSelected) {
+                tabButton.withStyle(selectedTabStyle != null ? selectedTabStyle : defaultSelectedStyle());
+            } else {
+                tabButton.withStyle(unselectedTabStyle != null ? unselectedTabStyle : defaultUnselectedStyle());
             }
 
             this.addChild(tabButton);
@@ -183,8 +193,7 @@ public class TabNavigationBuilder extends UIElementBuilder<TabNavigationBuilder>
      */
     public static HyUIStyle defaultSelectedStyle() {
         return new HyUIStyle()
-                .setRenderBold(true)
-                .setTextColor("#FFFFFF");
+                .setRenderBold(true);
     }
 
     /**
@@ -192,7 +201,6 @@ public class TabNavigationBuilder extends UIElementBuilder<TabNavigationBuilder>
      */
     public static HyUIStyle defaultUnselectedStyle() {
         return new HyUIStyle()
-                .setRenderBold(false)
-                .setTextColor("#AAAAAA");
+                .setRenderBold(false);
     }
 }

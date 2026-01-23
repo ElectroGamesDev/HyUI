@@ -3,6 +3,7 @@ package au.ellie.hyui.html.handlers;
 import au.ellie.hyui.builders.*;
 import au.ellie.hyui.html.HtmlParser;
 import au.ellie.hyui.html.TagHandler;
+import au.ellie.hyui.utils.ParseUtils;
 import org.jsoup.nodes.Element;
 
 public class InputHandler implements TagHandler {
@@ -27,58 +28,51 @@ public class InputHandler implements TagHandler {
                 break;
             case "number":
                 builder = NumberFieldBuilder.numberInput();
+                NumberFieldBuilder numBuilder = (NumberFieldBuilder) builder;
                 if (element.hasAttr("value")) {
-                    try {
-                        ((NumberFieldBuilder) builder).withValue(Double.parseDouble(element.attr("value")));
-                    } catch (NumberFormatException ignored) {}
+                    ParseUtils.parseDouble(element.attr("value"))
+                            .ifPresent(numBuilder::withValue);
                 }
                 if (element.hasAttr("format")) {
-                    ((NumberFieldBuilder) builder).withFormat(element.attr("format"));
+                    numBuilder.withFormat(element.attr("format"));
                 }
                 if (element.hasAttr("data-hyui-max-decimal-places")) {
-                    try {
-                        ((NumberFieldBuilder) builder).withMaxDecimalPlaces(Integer.parseInt(element.attr("data-hyui-max-decimal-places")));
-                    } catch (NumberFormatException ignored) {}
+                    ParseUtils.parseInt(element.attr("data-hyui-max-decimal-places"))
+                            .ifPresent(numBuilder::withMaxDecimalPlaces);
                 }
                 break;
             case "range":
                 builder = SliderBuilder.gameSlider();
+                SliderBuilder sliderBuilder = (SliderBuilder) builder;
                 if (element.hasAttr("value")) {
-                    try {
-                        ((SliderBuilder) builder).withValue(Integer.parseInt(element.attr("value")));
-                    } catch (NumberFormatException ignored) {}
+                    ParseUtils.parseInt(element.attr("value"))
+                            .ifPresent(sliderBuilder::withValue);
                 }
                 if (element.hasAttr("min")) {
-                    try {
-                        ((SliderBuilder) builder).withMin(Integer.parseInt(element.attr("min")));
-                    } catch (NumberFormatException ignored) {}
+                    ParseUtils.parseInt(element.attr("min"))
+                            .ifPresent(sliderBuilder::withMin);
                 }
                 if (element.hasAttr("max")) {
-                    try {
-                        ((SliderBuilder) builder).withMax(Integer.parseInt(element.attr("max")));
-                    } catch (NumberFormatException ignored) {}
+                    ParseUtils.parseInt(element.attr("max"))
+                            .ifPresent(sliderBuilder::withMax);
                 }
                 if (element.hasAttr("step")) {
-                    try {
-                        ((SliderBuilder) builder).withStep(Integer.parseInt(element.attr("step")));
-                    } catch (NumberFormatException ignored) {}
+                    ParseUtils.parseInt(element.attr("step"))
+                            .ifPresent(sliderBuilder::withStep);
                 }
 
                 // Support data-hyui-* attributes for slider as well
                 if (element.hasAttr("data-hyui-min")) {
-                    try {
-                        ((SliderBuilder) builder).withMin(Integer.parseInt(element.attr("data-hyui-min")));
-                    } catch (NumberFormatException ignored) {}
+                    ParseUtils.parseInt(element.attr("data-hyui-min"))
+                            .ifPresent(sliderBuilder::withMin);
                 }
                 if (element.hasAttr("data-hyui-max")) {
-                    try {
-                        ((SliderBuilder) builder).withMax(Integer.parseInt(element.attr("data-hyui-max")));
-                    } catch (NumberFormatException ignored) {}
+                    ParseUtils.parseInt(element.attr("data-hyui-max"))
+                            .ifPresent(sliderBuilder::withMax);
                 }
                 if (element.hasAttr("data-hyui-step")) {
-                    try {
-                        ((SliderBuilder) builder).withStep(Integer.parseInt(element.attr("data-hyui-step")));
-                    } catch (NumberFormatException ignored) {}
+                    ParseUtils.parseInt(element.attr("data-hyui-step"))
+                            .ifPresent(sliderBuilder::withStep);
                 }
                 break;
             case "checkbox":
@@ -115,9 +109,8 @@ public class InputHandler implements TagHandler {
             builder.withPlaceholderText(element.attr("placeholder"));
         }
         if (element.hasAttr("maxlength")) {
-            try {
-                builder.withMaxLength(Integer.parseInt(element.attr("maxlength")));
-            } catch (NumberFormatException ignored) {}
+            ParseUtils.parseInt(element.attr("maxlength"))
+                    .ifPresent(builder::withMaxLength);
         }
         if (element.hasAttr("readonly")) {
             builder.withReadOnly(true);

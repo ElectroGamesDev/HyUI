@@ -21,7 +21,7 @@ import java.util.List;
 public class HtmlParser {
     private final List<TagHandler> handlers = new ArrayList<>();
     private TemplateProcessor templateProcessor;
-
+    
     public HtmlParser() {
         // Register default handlers
         registerHandler(new ItemGridHandler());
@@ -65,7 +65,7 @@ public class HtmlParser {
     public TemplateProcessor getTemplateProcessor() {
         return templateProcessor;
     }
-
+    
     /**
      * Parses the HTML string and adds elements to the InterfaceBuilder.
      *
@@ -92,7 +92,6 @@ public class HtmlParser {
             processedHtml = templateProcessor.process(html);
             HyUIPlugin.getLog().logInfo("Processed template: " + processedHtml);
         }
-
         Document doc = Jsoup.parseBodyFragment(processedHtml);
         new CssPreprocessor().process(doc);
         HyUIPlugin.getLog().logInfo("Document elements after preprocessing: " + doc.body().html());

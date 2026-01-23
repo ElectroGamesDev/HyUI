@@ -2,10 +2,7 @@ package au.ellie.hyui;
 
 import au.ellie.hyui.builders.HudBuilder;
 import au.ellie.hyui.builders.LabelBuilder;
-import au.ellie.hyui.commands.HyUIAddHudCommand;
-import au.ellie.hyui.commands.HyUIRemHudCommand;
-import au.ellie.hyui.commands.HyUIUpdateHudCommand;
-import au.ellie.hyui.commands.HyUITestGuiCommand;
+import au.ellie.hyui.commands.*;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
@@ -41,6 +38,7 @@ public class HyUIPlugin extends JavaPlugin {
             this.getCommandRegistry().registerCommand(new HyUIAddHudCommand());
             this.getCommandRegistry().registerCommand(new HyUIRemHudCommand());
             this.getCommandRegistry().registerCommand(new HyUIUpdateHudCommand());
+            this.getCommandRegistry().registerCommand(new HyUIShowcaseCommand());
             
             this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, event -> {
                 instance.logInfo("Player ready event triggered for " + event.getPlayer().getDisplayName());

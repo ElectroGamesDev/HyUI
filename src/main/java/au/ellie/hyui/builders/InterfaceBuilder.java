@@ -37,6 +37,16 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
     /**
      * Loads and processes an HTML template with variable substitution.
      *
+     * <p>Example usage:</p>
+     * <pre>
+     * builder.fromTemplate("""
+     *     &lt;p&gt;Hello, {{$playerName}}!&lt;/p&gt;
+     *     &lt;p&gt;Score: {{$score|0}}&lt;/p&gt;
+     *     """, new TemplateProcessor()
+     *         .setVariable("playerName", player.getName())
+     *         .setVariable("score", 1500));
+     * </pre>
+     *
      * @param html     The HTML template with {{$variable}} placeholders
      * @param template The template processor with variables set
      * @return This builder instance for method chaining

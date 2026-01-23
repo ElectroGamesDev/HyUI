@@ -26,7 +26,7 @@ public class TimerHandler implements TagHandler {
     @Override
     public boolean canHandle(Element element) {
         return element.tagName().equalsIgnoreCase("timer") ||
-               (element.tagName().equalsIgnoreCase("span") && element.hasClass("timer"));
+                (element.tagName().equalsIgnoreCase("span") && element.hasClass("timer"));
     }
 
     @Override
@@ -37,14 +37,14 @@ public class TimerHandler implements TagHandler {
 
         // Parse time value
         if (element.hasAttr("value")) {
-            ParseUtils.parseLong(element.attr("value"), "timer value")
-                .ifPresent(builder::withTimeMs);
+            ParseUtils.parseLong(element.attr("value"))
+                    .ifPresent(builder::withTimeMs);
         }
 
         // Parse time in seconds
         if (element.hasAttr("data-hyui-time-seconds")) {
-            ParseUtils.parseLong(element.attr("data-hyui-time-seconds"), "timer time-seconds")
-                .ifPresent(builder::withTimeSeconds);
+            ParseUtils.parseLong(element.attr("data-hyui-time-seconds"))
+                    .ifPresent(builder::withTimeSeconds);
         }
 
         // Parse format

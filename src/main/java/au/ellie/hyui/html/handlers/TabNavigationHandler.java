@@ -82,8 +82,8 @@ public class TabNavigationHandler implements TagHandler {
 
         // Apply tab spacing if specified
         if (element.hasAttr("data-tab-spacing")) {
-            ParseUtils.parseInt(element.attr("data-tab-spacing"), "tab-navigation spacing")
-                .ifPresent(builder::withTabSpacing);
+            ParseUtils.parseInt(element.attr("data-tab-spacing"))
+                    .ifPresent(builder::withTabSpacing);
         }
 
         return builder;

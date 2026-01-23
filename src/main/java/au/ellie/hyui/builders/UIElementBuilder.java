@@ -438,8 +438,9 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
             }
 
             if (flexWeight != null) {
-                HyUIPlugin.getLog().logInfo("Setting FlexWeight: " + flexWeight + " for " + selector);
-                commands.set(selector + ".FlexWeight", flexWeight);
+                String flexSelector = wrapInGroup ? "#" + getWrappingGroupId() : selector;
+                HyUIPlugin.getLog().logInfo("Setting FlexWeight: " + flexWeight + " for " + flexSelector);
+                commands.set(flexSelector + ".FlexWeight", flexWeight);
             }
 
             if (hyUIStyle != null) {
