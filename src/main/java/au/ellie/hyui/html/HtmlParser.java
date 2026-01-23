@@ -20,6 +20,7 @@ import java.util.List;
  */
 public class HtmlParser {
     private final List<TagHandler> handlers = new ArrayList<>();
+    private TemplateProcessor templateProcessor;
 
     public HtmlParser() {
         // Register default handlers
@@ -34,6 +35,8 @@ public class HtmlParser {
         registerHandler(new ItemSlotHandler());
         registerHandler(new SelectHandler());
         registerHandler(new SpriteHandler());
+        registerHandler(new TimerHandler());
+        registerHandler(new TabNavigationHandler());
     }
 
     /**
@@ -44,7 +47,25 @@ public class HtmlParser {
     public void registerHandler(TagHandler handler) {
         handlers.add(handler);
     }
-    
+
+    /**
+     * Sets the template processor for variable interpolation and component inclusion.
+     *
+     * @param processor The template processor to use.
+     */
+    public void setTemplateProcessor(TemplateProcessor processor) {
+        this.templateProcessor = processor;
+    }
+
+    /**
+     * Gets the current template processor.
+     *
+     * @return The template processor, or null if not set.
+     */
+    public TemplateProcessor getTemplateProcessor() {
+        return templateProcessor;
+    }
+
     /**
      * Parses the HTML string and adds elements to the InterfaceBuilder.
      *
@@ -65,7 +86,14 @@ public class HtmlParser {
      * @return A list of UIElementBuilders.
      */
     public List<UIElementBuilder<?>> parse(String html) {
-        Document doc = Jsoup.parseBodyFragment(html);
+        // Apply template processing if a processor is set
+        String processedHtml = html;
+        if (templateProcessor != null) {
+            processedHtml = templateProcessor.process(html);
+            HyUIPlugin.getLog().logInfo("Processed template: " + processedHtml);
+        }
+
+        Document doc = Jsoup.parseBodyFragment(processedHtml);
         new CssPreprocessor().process(doc);
         HyUIPlugin.getLog().logInfo("Document elements after preprocessing: " + doc.body().html());
         return parseChildren(doc.body());

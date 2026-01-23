@@ -2,6 +2,7 @@ package au.ellie.hyui.builders;
 
 import au.ellie.hyui.events.UIContext;
 import au.ellie.hyui.html.HtmlParser;
+import au.ellie.hyui.html.TemplateProcessor;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 
@@ -31,6 +32,31 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
     public T fromHtml(String html) {
         new HtmlParser().parseToInterface(this, html);
         return self();
+    }
+
+    /**
+     * Loads and processes an HTML template with variable substitution.
+     *
+     * @param html     The HTML template with {{$variable}} placeholders
+     * @param template The template processor with variables set
+     * @return This builder instance for method chaining
+     */
+    public T fromTemplate(String html, TemplateProcessor template) {
+        HtmlParser parser = new HtmlParser();
+        parser.setTemplateProcessor(template);
+        parser.parseToInterface(this, html);
+        return self();
+    }
+
+    /**
+     * Loads and processes an HTML template with a map of variables.
+     *
+     * @param html      The HTML template with {{$variable}} placeholders
+     * @param variables Map of variable names to values
+     * @return This builder instance for method chaining
+     */
+    public T fromTemplate(String html, Map<String, ?> variables) {
+        return fromTemplate(html, new TemplateProcessor().setVariables(variables));
     }
 
     public T addElement(UIElementBuilder<?> element) {
