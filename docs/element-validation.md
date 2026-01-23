@@ -2,6 +2,8 @@
 
 This document is the property checklist we validate against for HyUI `.ui` files and builders.
 
+We do not validate possible client-side elements, properties, or styles.
+
 ## Syntax Notes
 
 - `$Var = "path/to/file.ui"` imports another UI file.
@@ -34,82 +36,88 @@ This document is the property checklist we validate against for HyUI `.ui` files
 ## Elements
 
 ### Container
-
-- `LayoutMode`
-- `ScrollbarStyle`
-- `ClipChildren`
+- NO STYLE.
+- `LayoutMode` (see Layout Modes)
+- `ScrollbarStyle` (Value reference)
+- `ClipChildren` (Boolean)
 - `#Content` and `#Title` are `Group` elements and follow group rules.
 - The common `@Title` must use `@Text = "Value"` and must be first in the properties list.
 
 ### PageOverlay
-
-- `LayoutMode`
-- `ScrollbarStyle`
-- `ClipChildren`
+- NO STYLE.
+- `LayoutMode` (see Layout Modes)
+- `ScrollbarStyle` (Value reference)
+- `ClipChildren` (Boolean)
 
 ### Group
-
-- `LayoutMode`
-- `ScrollbarStyle`
-- `ClipChildren`
+- NO STYLE.
+- `LayoutMode` (see Layout Modes)
+- `ScrollbarStyle` (Value reference)
+- `ClipChildren` (Boolean)
 
 ### ColorPicker
 
-- `Value`
-- `Style` (excluding `TextColor`)
+- `Value` (String, hex)
+- Style:  `PaddingLeft` (Integer), `PaddingRight` (Integer), `PaddingTop` (Integer), `PaddingBottom` (Integer), `FontSize` (Integer), `RenderBold` (Boolean), `RenderItalics` (Boolean), `RenderUppercase` (Boolean), `FontName` (String: Default or Secondary), `Wrap` (Boolean), `LetterSpacing` (Integer)
 
 ### Label
 
-- `Text`
-- `Style` (including `Alignment`, `HorizontalAlignment`, `VerticalAlignment`)
+- `Text` (String/Message)
+- Style: `PaddingLeft` (Integer), `PaddingRight` (Integer), `PaddingTop` (Integer), `PaddingBottom` (Integer), `Alignment` (Integer), `HorizontalAlignment` (Integer), `VerticalAlignment` (Integer), `FontSize` (Integer), `TextColor` (Color), `RenderBold` (Boolean), `RenderItalics` (Boolean), `RenderUppercase` (Boolean), `FontName` (String: Default or Secondary), `Wrap` (Boolean), `LetterSpacing` (Integer), `OutlineColor` (Color)
+  - Or a style reference.
 
 ### TimerLabel
 
-- `Seconds`
-- `Style` (including `Alignment`, `HorizontalAlignment`, `VerticalAlignment`)
+- `Seconds` (Number)
+- Style: `PaddingLeft` (Integer), `PaddingRight` (Integer), `PaddingTop` (Integer), `PaddingBottom` (Integer), `Alignment` (Integer), `HorizontalAlignment` (Integer), `VerticalAlignment` (Integer), `FontSize` (Integer), `TextColor` (Color), `RenderBold` (Boolean), `RenderItalics` (Boolean), `RenderUppercase` (Boolean), `FontName` (String: Default or Secondary), `Wrap` (Boolean), `LetterSpacing` (Integer), `OutlineColor` (Color)
+  - Or a style reference.
 
 ### TextButton
 
-- `Text` (string, not `@Text`)
-- `Disabled`
-- `Style` (excluding `Alignment`, `HorizontalAlignment`, `VerticalAlignment`, `TextColor`)
+- `Text` (String, not `@Text`)
+- `Disabled` (Boolean)
+- Style: `PaddingLeft` (Integer), `PaddingRight` (Integer), `PaddingTop` (Integer), `PaddingBottom` (Integer), `FontSize` (Integer), `RenderBold` (Boolean), `RenderItalics` (Boolean), `RenderUppercase` (Boolean), `FontName` (String: Default or Secondary), `Wrap` (Boolean), `LetterSpacing` (Integer), `OutlineColor` (Color)
   - A raw `Button` may use `TextColor`.
-- `LayoutMode`
-- `Overscroll`
+  - Or a style reference.
+- `LayoutMode` (see Layout Modes)
+- `Overscroll` (Boolean)
 
 ### NumberField
 
-- `Value`
-- `Format`
-- `MaxDecimalPlaces`
+- `Value` (Number)
+- `Format` (String)
+- `MaxDecimalPlaces` (Integer)
+- Style: Unknown but excludes `TextColor`
 
 ### TextField
 
-- `Value`
-- `PlaceholderText`
-- `MaxLength`
-- `MaxVisibleLines`
-- `ReadOnly`
-- `Password`
-- `PasswordChar`
-- `AutoGrow`
-- `Style` (excluding `TextColor`)
+- `Value` (String)
+- `PlaceholderText` (String)
+- `MaxLength` (Integer)
+- `MaxVisibleLines` (Integer)
+- `ReadOnly` (Boolean)
+- `Password` (Boolean)
+- `PasswordChar` (String)
+- `AutoGrow` (Boolean)
+- Style: Unknown but excludes `TextColor`
 
 ### AssetImage
-
-- `LayoutMode`
-- `AssetPath`
+- NO STYLE.
+- `LayoutMode` (see Layout Modes)
+- `AssetPath` (String)
 
 ### ItemIcon
-
-- `ItemId` (example: `Tool_Pickaxe_Crude`)
+- NO STYLE.
+- `ItemId` (String, example: `Tool_Pickaxe_Crude`)
 
 ### Sprite
-
-- `TexturePath`
-- `Frame` as `(Width: X, Height: Y, PerRow: Z, Count: A)` with all values as integers
-- `FramesPerSecond`
+- `TexturePath` (String)
+- `Frame` (Frame, as `(Width: Int, Height: Int, PerRow: Int, Count: Int)`)
+- `FramesPerSecond` (Integer)
+- Styles: `PaddingLeft` (Integer), `PaddingRight` (Integer), `PaddingTop` (Integer), `PaddingBottom` (Integer)
 
 ### CheckBoxWithLabel
 
-- `@Text` must be first and must be present.
+- `@Text` (String) must be first and must be present.
+- Styles: `PaddingLeft` (Integer), `PaddingRight` (Integer), `PaddingTop` (Integer), `PaddingBottom` (Integer)
+  - Not confirmed, but `TextColor` is not allowed.
