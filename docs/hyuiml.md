@@ -37,7 +37,7 @@ PageBuilder.pageForPlayer(playerRef)
 | `<input type="checkbox">` | `CheckBoxBuilder` | Toggle switches.                                                    |
 | `<input type="color">`    | `ColorPickerBuilder` | Color selectors.                                                                                                         |
 | `<input type="reset">`    | `ButtonBuilder` | Specifically creates a `CancelTextButton`.                                                                               |
-| `<progress>`              | `ProgressBarBuilder` | Displays a progress bar.                                                                                                 |
+| `<progress>`              | `ProgressBarBuilder` | Displays a progress bar. Add `class="circular-progress"` to render a CircularProgressBar.                                |
 | `<span class="item-icon">` | `ItemIconBuilder` | Displays an item icon. Use `data-hyui-item-id` for the item icon.                                                        |
 | `<span class="item-slot">` | `ItemSlotBuilder` | Displays a full item slot. Use `data-hyui-item-id` for the item.                                                         |
 | `<div class="item-grid">` | `ItemGridBuilder` | Displays an item grid container.                                                                                         |
@@ -72,6 +72,8 @@ HYUIML supports several standard and custom attributes:
 *   `data-hyui-effect-width`, `data-hyui-effect-height`, `data-hyui-effect-offset`: Customizes the progress bar's effect appearance.
 *   `data-hyui-direction`: Progress bar fill direction (`start` or `end`).
 *   `data-hyui-alignment`: Progress bar orientation (`horizontal` or `vertical`).
+*   `data-hyui-mask-texture-path`: Circular progress bar mask texture path.
+*   `data-hyui-color`: Progress bar fill color (hex).
 *   `data-hyui-allowunselection`: Specific to `<select>`, allows deselecting items.
 *   `data-hyui-maxselection`: Specific to `<select>`, number of maximum selectable items.
 *   `data-hyui-entryheight`: Specific to `<select>`, height of each dropdown entry.
@@ -142,6 +144,22 @@ You can include a `<style>` block at the beginning of your HYUIML:
 *   `background-color`: Hex color (e.g., `#ff0000` or `#ff0000(0.5)`) or `rgb(...)`/`rgba(...)` (converted to hex). Supports optional border values: `background-color: #ff0000 4 6` (horizontal, vertical) or `background-color: rgba(255, 0, 0, 0.5) 4` (border).
 
 > **Note on Backgrounds**: Due to Hytale limitations, you currently cannot use `background-image`, `background-color`, and background opacity together in a single element's style. 
+
+#### Custom Style Properties
+
+Some elements support additional style properties that are not exposed via the standard CSS mapping. Use `data-hyui-style` to set arbitrary style keys directly on the element's `HyUIStyle`:
+
+```html
+<div class="item-grid" data-hyui-style="SlotSpacing: 6"></div>
+```
+
+Multiple properties can be specified in the same attribute:
+
+```html
+<div class="item-grid" data-hyui-style="SlotSpacing: 6; SlotSize: 64"></div>
+```
+
+These map to `HyUIStyle.set(key, value)` and are applied alongside any existing CSS-derived styles.
 
 #### Image Assets
 

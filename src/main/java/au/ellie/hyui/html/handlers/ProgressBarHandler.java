@@ -15,7 +15,10 @@ public class ProgressBarHandler implements TagHandler {
 
     @Override
     public UIElementBuilder<?> handle(Element element, HtmlParser parser) {
-        ProgressBarBuilder builder = ProgressBarBuilder.progressBar();
+        boolean isCircular = element.hasClass("circular-progress") || element.hasClass("circular");
+        ProgressBarBuilder builder = isCircular
+                ? ProgressBarBuilder.circularProgressBar()
+                : ProgressBarBuilder.progressBar();
 
         if (element.hasAttr("value")) {
             ParseUtils.parseFloat(element.attr("value")).ifPresent(value -> {
@@ -46,6 +49,14 @@ public class ProgressBarHandler implements TagHandler {
         }
         if (element.hasAttr("data-hyui-effect-texture-path")) {
             builder.withEffectTexturePath(element.attr("data-hyui-effect-texture-path"));
+        }
+
+        if (element.hasAttr("data-hyui-mask-texture-path")) {
+            builder.withMaskTexturePath(element.attr("data-hyui-mask-texture-path"));
+        }
+
+        if (element.hasAttr("data-hyui-color")) {
+            builder.withColor(element.attr("data-hyui-color"));
         }
 
         if (element.hasAttr("data-hyui-alignment")) {

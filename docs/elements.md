@@ -193,3 +193,28 @@ PageBuilder.pageForPlayer(playerRef)
 ```
 
 If you have multiple tab navs, set `data-hyui-tab-nav` (HYUIML) or `withTabNavigationId(...)` (Java) on the content to target a specific navigation ID.
+
+### Circular Progress Bar Example
+
+A `CircularProgressBar` uses a mask texture and color to render a radial fill.
+
+#### HYUIML Example
+
+```html
+<progress class="circular-progress"
+          value="0.65"
+          data-hyui-mask-texture-path="MaskTexture.png"
+          data-hyui-color="#ffffff"
+          style="anchor-width: 98; anchor-height: 98;">
+</progress>
+```
+
+#### Java Builder Example
+
+```java
+ProgressBarBuilder.circularProgressBar()
+    .withValue(0.65f)
+    .withMaskTexturePath("MaskTexture.png")
+    .withColor("#ffffff")
+    .withAnchor(new HyUIAnchor().setWidth(98).setHeight(98));
+```

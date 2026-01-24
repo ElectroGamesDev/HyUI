@@ -13,6 +13,7 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Builder for the ItemGrid UI element.
@@ -134,7 +135,14 @@ public class ItemGridBuilder extends UIElementBuilder<ItemGridBuilder> implement
 
     @Override
     protected boolean supportsStyling() {
-        return false;
+        return true;
+    }
+    
+    @Override
+    protected boolean isStyleWhitelist() { return true; }
+
+    protected Set<String> getSupportedStyleProperties() {
+        return Set.of("SlotSpacing", "SlotSize", "SlotIconSize", "SlotBackground");
     }
 
     @Override

@@ -468,23 +468,27 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
             if (hyUIStyle != null) {
                 BsonDocumentHelper doc = PropertyBatcher.beginSet();
                 applyStyle(commands, selector + ".Style", hyUIStyle, doc);
+                PropertyBatcher.endSet(selector + ".Style", doc, commands);
+                applyRawStyleProperties(commands, selector + ".Style", hyUIStyle);
                 hyUIStyle.getStates().forEach((state, nestedStyle) -> {
                     BsonDocumentHelper innerDoc = PropertyBatcher.beginSet();
                     applyStyle(commands, selector + ".Style." + state, nestedStyle, innerDoc);
                     PropertyBatcher.endSet(selector + ".Style." + state, doc, commands);
+                    applyRawStyleProperties(commands, selector + ".Style." + state, nestedStyle);
                 });
-                PropertyBatcher.endSet(selector + ".Style", doc, commands);
             }
 
             secondaryStyles.forEach((property, style) -> {
                 BsonDocumentHelper doc = PropertyBatcher.beginSet();
                 applyStyle(commands, selector + "." + property, style, doc);
+                PropertyBatcher.endSet(selector + "." + property, doc, commands);
+                applyRawStyleProperties(commands, selector + "." + property, style);
                 style.getStates().forEach((state, nestedStyle) -> {
                     BsonDocumentHelper innerDoc = PropertyBatcher.beginSet();
                     applyStyle(commands, selector + "." + property + "." + state, nestedStyle, innerDoc);
                     PropertyBatcher.endSet(selector + "." + property + "." + state, doc, commands);
+                    applyRawStyleProperties(commands, selector + "." + property + "." + state, nestedStyle);
                 });
-                PropertyBatcher.endSet(selector + "." + property, doc, commands);
             });
         }
     }
@@ -629,23 +633,34 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
             HyUIPlugin.getLog().logInfo("Setting Style Alignment: " + style.getAlignment() + " for " + prefix);
             doc.set("Alignment", style.getAlignment().name());
         }
-
+    }
+    
+    protected void applyRawStyleProperties(UICommandBuilder commands, String prefix, HyUIStyle style) {
+        boolean whitelist = isStyleWhitelist();
+        Set<String> supported = whitelist ? getSupportedStyleProperties() : Set.of();
+        Set<String> unsupported = whitelist ? Set.of() : getUnsupportedStyleProperties();
+        java.util.function.Predicate<String> isAllowed = property -> {
+            if (whitelist) {
+                return supported.contains(property);
+            }
+            return !unsupported.contains(property);
+        };
         style.getRawProperties().forEach((key, value) -> {
             if (!isAllowed.test(key)) {
                 return;
             }
+            var fullPrefix = prefix + "." + key;
             HyUIPlugin.getLog().logInfo("Setting Style Raw Property: " + key + "=" + value + " for " + prefix);
             switch (value) {
-                case String s -> doc.set(key, s);
-                case Boolean b -> doc.set(key, b);
-                case Double v -> doc.set(key, v);
-                case Integer i -> doc.set(key, i);
-                case Float v -> doc.set(key, v);
-                case null, default -> doc.set(key, String.valueOf(value));
+                case String s -> commands.set(fullPrefix, s);
+                case Boolean b -> commands.set(fullPrefix, b);
+                case Double v -> commands.set(fullPrefix, v);
+                case Integer i -> commands.set(fullPrefix, i);
+                case Float v -> commands.set(fullPrefix, v);
+                case null, default -> commands.set(fullPrefix, String.valueOf(value));
             }
         });
     }
-
     protected String getWrappingGroupId() {
         return id;
     }

@@ -5,6 +5,7 @@ import au.ellie.hyui.events.UIContext;
 import au.ellie.hyui.events.UIEventActions;
 import au.ellie.hyui.elements.UIElements;
 import au.ellie.hyui.theme.Theme;
+import com.github.luben.zstd.ZstdCompressCtx;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
@@ -240,7 +241,12 @@ public class NumberFieldBuilder extends UIElementBuilder<NumberFieldBuilder> {
         }
         if (listeners.isEmpty()) {
             // To handle data back to the .getValue, we need to add at least one listener.
-            addEventListener(CustomUIEventBindingType.ValueChanged, (_, _) -> {});
+            addEventListener(CustomUIEventBindingType.ValueChanged, (v, ctx) -> {
+               /* // Here we update the backing builder's value so when we reload the UI we forcibly keep state!
+                ctx.getById(this.id, NumberFieldBuilder.class).ifPresent(builder -> {
+                    builder.withValue(v);
+                });*/
+            });
         }
         listeners.forEach(listener -> {
             if (listener.type() == CustomUIEventBindingType.ValueChanged) {

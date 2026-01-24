@@ -55,12 +55,12 @@ public interface TagHandler {
         }
 
         if (element.hasAttr("style")) {
-            Map<String, String> styles = parseStyleAttribute(element.attr("style"));
+            Map<String, Object> styles = parseStyleAttribute(element.attr("style"));
             applyStyles(builder, styles);
         }
 
         if (element.hasAttr("data-hyui-hover-style")) {
-            Map<String, String> hoverStyles = parseStyleAttribute(element.attr("data-hyui-hover-style"));
+            Map<String, Object> hoverStyles = parseStyleAttribute(element.attr("data-hyui-hover-style"));
             ParsedStyles parsed = getStylesAnchorsPadding(hoverStyles, builder);
             if (parsed.hasStyle) {
                 HyUIStyle currentStyle = builder.getHyUIStyle();
@@ -70,6 +70,21 @@ public interface TagHandler {
                 HyUIPlugin.getLog().logInfo("Applying hover style: " + parsed.style.toString());
                 HyUIPlugin.getLog().logInfo("Applying style: " + currentStyle.toString());
                 builder.withStyle(currentStyle.setHoverStyle(parsed.style));
+            }
+        }
+
+        if (element.hasAttr("data-hyui-style")) {
+            Map<String, Object> rawStyles = parseStyleAttribute(element.attr("data-hyui-style"));
+            if (!rawStyles.isEmpty()) {
+                HyUIStyle currentStyle = builder.getHyUIStyle();
+                if (currentStyle == null) {
+                    currentStyle = new HyUIStyle();
+                }
+                for (Map.Entry<String, Object> entry : rawStyles.entrySet()) {
+                    HyUIPlugin.getLog().logInfo("Applying style property: " + entry.getKey() + " with value: " + entry.getValue());
+                    currentStyle.set(entry.getKey(), entry.getValue());
+                }
+                builder.withStyle(currentStyle);
             }
         }
 
@@ -99,19 +114,19 @@ public interface TagHandler {
         }
     }
 
-    private Map<String, String> parseStyleAttribute(String styleAttr) {
-        Map<String, String> styles = new HashMap<>();
+    private Map<String, Object> parseStyleAttribute(String styleAttr) {
+        Map<String, Object> styles = new HashMap<>();
         String[] declarations = styleAttr.split(";");
         for (String declaration : declarations) {
             String[] parts = declaration.split(":", 2);
             if (parts.length == 2) {
-                styles.put(parts[0].trim().toLowerCase(), parts[1].trim());
+                styles.put(parts[0].trim(), parseStyleValue(parts[1].trim()));
             }
         }
         return styles;
     }
 
-    private void applyStyles(UIElementBuilder<?> builder, Map<String, String> styles) {
+    private void applyStyles(UIElementBuilder<?> builder, Map<String, Object> styles) {
         ParsedStyles parsed = getStylesAnchorsPadding(styles, builder);
         if (parsed.hasStyle) {
             builder.withStyle(parsed.style);
@@ -133,12 +148,12 @@ public interface TagHandler {
         boolean hasPadding = false;
     }
 
-    private ParsedStyles getStylesAnchorsPadding(Map<String, String> styles, UIElementBuilder<?> builder) {
+    private ParsedStyles getStylesAnchorsPadding(Map<String, Object> styles, UIElementBuilder<?> builder) {
         ParsedStyles parsed = new ParsedStyles();
 
-        for (Map.Entry<String, String> entry : styles.entrySet()) {
+        for (Map.Entry<String, Object> entry : styles.entrySet()) {
             String key = entry.getKey();
-            String value = entry.getValue();
+            String value = toStyleString(entry.getValue());
 
             switch (key) {
                 case "color":
@@ -440,6 +455,24 @@ public interface TagHandler {
             }
         }
         return parsed;
+    }
+
+    private Object parseStyleValue(String value) {
+        if (value == null) {
+            return "";
+        }
+        String trimmed = value.trim();
+        if (trimmed.equalsIgnoreCase("true") || trimmed.equalsIgnoreCase("false")) {
+            return Boolean.parseBoolean(trimmed);
+        }
+        return ParseUtils.parseInt(trimmed)
+                .<Object>map(Integer::valueOf)
+                .or(() -> ParseUtils.parseDouble(trimmed).map(Double::valueOf))
+                .orElse(trimmed);
+    }
+
+    private String toStyleString(Object value) {
+        return value != null ? String.valueOf(value) : "";
     }
 
     private HyUIStyle parseStyleReference(String value) {
