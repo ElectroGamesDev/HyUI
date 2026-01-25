@@ -319,7 +319,7 @@ public class HyUIHud extends CustomUIHud implements UIContext {
             return;
         }
         getById(dynamicImageElementId, DynamicImageBuilder.class).ifPresent(dynamicImage -> {
-            dynamicImage.invalidateImage();
+            dynamicImage.invalidateImage(playerRefInternal.getUuid());
             InterfaceBuilder.sendDynamicImage(playerRefInternal, dynamicImage);
             updatePage(true);
         });

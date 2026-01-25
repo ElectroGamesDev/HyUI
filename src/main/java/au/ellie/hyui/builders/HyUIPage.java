@@ -46,7 +46,7 @@ public class HyUIPage extends InteractiveCustomUIPage<DynamicPageData> implement
     public void close() {
         super.close();
         HyUIPlugin.getLog().logInfo("Page closed!");
-        delegate.releaseDynamicImages();
+        delegate.releaseDynamicImages(playerRef.getUuid());
     }
     
     @Override
@@ -79,7 +79,7 @@ public class HyUIPage extends InteractiveCustomUIPage<DynamicPageData> implement
             return;
         }
         getById(dynamicImageElementId, DynamicImageBuilder.class).ifPresent(dynamicImage -> {
-            dynamicImage.invalidateImage();
+            dynamicImage.invalidateImage(playerRef.getUuid());
             InterfaceBuilder.sendDynamicImage(playerRef, dynamicImage);
             updatePage(true);
         });
@@ -88,7 +88,7 @@ public class HyUIPage extends InteractiveCustomUIPage<DynamicPageData> implement
     @Override
     public void onDismiss(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {
         HyUIPlugin.getLog().logInfo("Page dismissed!");
-        delegate.releaseDynamicImages();
+        delegate.releaseDynamicImages(playerRef.getUuid());
     }
     
     @Override

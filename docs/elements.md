@@ -231,7 +231,7 @@ builder.addEventListener("reload-button", CustomUIEventBindingType.Activating, (
 ```
 
 Notes:
-*   Dynamic images are limited to 10 per page.
+*   Dynamic images are limited to 10 per page, per player.
 *   Downloaded PNGs are cached for 15 seconds.
 
 ### Hyvatar Image Example

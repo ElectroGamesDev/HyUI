@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.UUID;
 
 public abstract class HyUInterface implements UIContext {
 
@@ -243,17 +244,17 @@ public abstract class HyUInterface implements UIContext {
         this.elementValues = elementValues;
     }
 
-    public void releaseDynamicImages() {
-        getElements().forEach(this::releaseDynamicImagesRecursive);
+    public void releaseDynamicImages(UUID playerUuid) {
+        getElements().forEach(element -> releaseDynamicImagesRecursive(element, playerUuid));
     }
 
-    private void releaseDynamicImagesRecursive(UIElementBuilder<?> element) {
+    private void releaseDynamicImagesRecursive(UIElementBuilder<?> element, UUID playerUuid) {
         if (element instanceof DynamicImageBuilder) {
             HyUIPlugin.getLog().logInfo("Releasing image: " + element.getEffectiveId());
-            ((DynamicImageBuilder) element).invalidateImage();
+            ((DynamicImageBuilder) element).releaseSlotForPlayer(playerUuid);
         }
         for (UIElementBuilder<?> child : element.children) {
-            releaseDynamicImagesRecursive(child);
+            releaseDynamicImagesRecursive(child, playerUuid);
         }
     }
 }

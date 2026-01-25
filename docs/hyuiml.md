@@ -179,7 +179,7 @@ Use `class="dynamic-image"` on `<img>` to download a PNG at runtime:
 ```
 
 Notes:
-*   Dynamic images are limited to 10 per page.
+*   Dynamic images are limited to 10 per page, per player.
 *   Downloaded PNGs are cached for 15 seconds.
 
 #### Hyvatar Images

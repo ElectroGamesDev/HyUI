@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -219,9 +220,10 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
         if (pRef == null || !pRef.isValid()) {
             return;
         }
+        UUID playerUuid = pRef.getUuid();
         for (UIElementBuilder<?> element : elementRegistry.values()) {
             if (element instanceof DynamicImageBuilder dImg) {
-                if (dImg.isImagePathAssigned()) {
+                if (dImg.isImagePathAssigned(playerUuid)) {
                     continue;
                 }
                 sendDynamicImage(pRef, dImg);
@@ -233,6 +235,7 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
         if (pRef == null || dynamicImage == null) {
             return;
         }
+        UUID playerUuid = pRef.getUuid();
         String url = dynamicImage.getImageUrl();
         if (url == null || url.isBlank()) {
             return;
@@ -252,11 +255,10 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
                 imageBytes = PngDownloadUtils.downloadPng(url);
             }
 
-            DynamicImageAsset.sendToPlayer(pRef.getPacketHandler(), DynamicImageAsset.empty(DynamicImageAsset.peekNextSlotIndex()));
-
-            DynamicImageAsset asset = new DynamicImageAsset(imageBytes);
+            DynamicImageAsset asset = new DynamicImageAsset(imageBytes, playerUuid);
+            DynamicImageAsset.sendToPlayer(pRef.getPacketHandler(), DynamicImageAsset.empty(asset.getSlotIndex()));
             dynamicImage.withImagePath(asset.getPath());
-            dynamicImage.setSlotIndex(asset.getSlotIndex());
+            dynamicImage.setSlotIndex(playerUuid, asset.getSlotIndex());
 
             DynamicImageAsset.sendToPlayer(pRef.getPacketHandler(), asset);
             HyUIPlugin.getLog().logInfo("Dynamic image sent using path: " + asset.getPath());

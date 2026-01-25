@@ -53,7 +53,6 @@ public class HyUIPlugin extends JavaPlugin {
                 World world = store.getExternalData().getWorld();
                 world.execute(() -> {
                     PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
-                    
                     String html = "<hyvatar username='" + player.getDisplayName() + "' size='64'></hyvatar>";
                     var hud = HudBuilder.detachedHud()
                             .fromHtml(html)
