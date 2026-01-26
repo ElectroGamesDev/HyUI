@@ -12,6 +12,8 @@ import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -24,7 +26,7 @@ public class DropdownBoxBuilder extends UIElementBuilder<DropdownBoxBuilder> {
     private Integer maxSelection;
     private Integer entryHeight;
     private Boolean showLabel;
-    private java.util.List<DropdownEntryInfo> entries = new java.util.ArrayList<>();
+    private List<DropdownEntryInfo> entries = new ArrayList<>();
 
     public DropdownBoxBuilder() {
         super(UIElements.DROPDOWN_BOX, "#HyUIDropdownBox");

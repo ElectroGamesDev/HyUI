@@ -12,9 +12,10 @@ A `DropdownBox` allows players to select one or more options from a list.
 <select id="myDropdown" data-hyui-showlabel="true" value="Entry1">
     <option value="Entry1">First Entry</option>
     <option value="Entry2">Second Entry</option>
-    <option value="Entry3">Third Entry</option>
+    <option value="Entry3" selected>Third Entry</option>
 </select>
 ```
+In this example, the third entry will be selected in the UI, this is due to the `selected` attribute being specified on an entry. If there is multiple `selected` items the last will be specified as the  value. The `selected` attribute overrides the `value` attribute on the `select` element.
 
 > **Warning**: When setting the `value` attribute on a `<select>` tag, ensure it matches the `value` attribute of one of the `<option>` children.
 

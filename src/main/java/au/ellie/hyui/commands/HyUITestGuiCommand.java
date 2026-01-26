@@ -123,27 +123,11 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                                      Free text here should be a label!
                                     <input type="text" id="myInput"/>
                                 </div>
-                                <input type="number" value="42" style="padding: 10;"/>
-                                <input type="range" min="0" max="100" value="50" step="1"/>
-                                <label data-hyui-tooltiptext="This is a checkbox!">
-                                    Checkbox Label
-                                </label>
-                                <input type="checkbox" checked="true"/>
-                                <input type="color" value="#ff0000" 
-                                    style="anchor-width: 140; anchor-height: 120; anchor-left: 12"/>
-                                <img src="lizard.png" style="anchor-width: 100; anchor-height: 100;"/>
-                                <img src="lizard.png" width="100" height="50"/>
-                                <progress value="0.7" style="anchor-width: 500; anchor-height: 50" 
-                                    data-hyui-effect-width="500" 
-                                    data-hyui-effect-height="50" 
-                                    data-hyui-effect-offset="0"></progress>
-                                <span class="item-icon" data-hyui-item-id="Tool_Pickaxe_Crude" style="anchor-width: 64; anchor-height: 64;"></span>
-                               
                                 <button id="btn1">Click Me!</button>
                                 <select id="myDropdown" data-hyui-showlabel="true" value="Entry1">
                                     <option value="Entry1">First Entry</option>
                                     <option value="Entry2">Second Entry</option>
-                                    <option value="Entry3">Third Entry</option>
+                                    <option value="Entry3" selected>Third Entry</option>
                                 </select>
                                 <sprite src="Common/Spinner.png"
                                     data-hyui-frame-width="32"
@@ -160,7 +144,7 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                         </div>
                     </div>
                     """;
-        html = """
+        /*html = """
                     <div class="page-overlay">
                         <div class="decorated-container" style="anchor-width: 800; anchor-height: 900;" id="myContainer" data-hyui-title="HyUIML Parser Test">
                         <div style="anchor-left: 1; layout-mode: left;">
@@ -204,7 +188,7 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                         </div>
                     </div>
                     
-                    """;
+                    """;*/
 /*            html = """
                     <style>
                                  #Button {
@@ -279,7 +263,7 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
         AtomicInteger clicks = new AtomicInteger();
         PageBuilder builder = PageBuilder.detachedPage()
                 .fromHtml(html)
-                .addEventListener("itemgrid", CustomUIEventBindingType.Dropped, (data, ctx) -> {
+                /*.addEventListener("itemgrid", CustomUIEventBindingType.Dropped, (data, ctx) -> {
                     HyUIPlugin.getLog().logInfo("Item dropped on grid.");
                 })
                 .addEventListener("itemgrid", CustomUIEventBindingType.SlotClicking, (data, ctx) -> {
@@ -291,21 +275,32 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                 .addEventListener("test", CustomUIEventBindingType.Activating, (_, context) -> {
                     var a = context.getValue("price-input", Double.class);
                     a.ifPresent(aDouble -> HyUIPlugin.getLog().logInfo("Price input is: " + aDouble));
-                })
-                .withLifetime(CustomPageLifetime.CanDismiss);
-                /*.addEventListener("btn1", CustomUIEventBindingType.Activating, (data, ctx) -> {
+                })*/
+                .withLifetime(CustomPageLifetime.CanDismiss)
+                .addEventListener("btn1", CustomUIEventBindingType.Activating, (data, ctx) -> {
                     playerRef.sendMessage(Message.raw("Button clicked via PageBuilder ID lookup!: " +
                     ctx.getValue("myInput", String.class).orElse("N/A")));
                     HyUIPlugin.getLog().logInfo("Clicked button.");
                     ctx.getById("label", LabelBuilder.class).ifPresent(lb -> { 
                         lb.withText("ClicksA: " + String.valueOf(clicks.incrementAndGet()));
                         HyUIPlugin.getLog().logInfo("Found label builder.");
-                        ctx.updatePage(true);
-                        for (String s : ctx.getCommandLog()) {
+                        //ctx.updatePage(true);
+                        /*for (String s : ctx.getCommandLog()) {
                             HyUIPlugin.getLog().logInfo(s);
                         }
-                        HyUIPlugin.getLog().logInfo("Updated page.");
+                        HyUIPlugin.getLog().logInfo("Updated page.");*/
                     });
+                    var val = ctx.getValue("myDropdown", String.class).orElse("N/A");
+                    playerRef.sendMessage(Message.raw("Dropdown VALUE: " + val));
+                    ctx.getById("myDropdown", DropdownBoxBuilder.class).ifPresent(lb -> {
+                        HyUIPlugin.getLog().logInfo("Found Dropdown builder.");
+                        var val2 = ctx.getValue("myDropdown", String.class).orElse("N/A");
+                        playerRef.sendMessage(Message.raw("Dropdown VALUE: " + val2));
+                        // SETTING VALUE
+                        //lb.withValue("Entry3");
+                        
+                    });
+
                 })
                 .addEventListener("myInput", CustomUIEventBindingType.ValueChanged, String.class, (val) -> {
                     playerRef.sendMessage(Message.raw("Input changed to: " + val));
@@ -313,7 +308,7 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                 .addEventListener("myDropdown", CustomUIEventBindingType.ValueChanged, String.class, (val) -> {
                     playerRef.sendMessage(Message.raw("Dropdown changed to: " + val));
                 });
-*/
+
         // Or ... if you don't like building in method chains or want something custom...
         /*builder.getById("myInput", TextFieldBuilder.class).ifPresent(input -> {
             input.addEventListener(CustomUIEventBindingType.ValueChanged, (val) -> {
