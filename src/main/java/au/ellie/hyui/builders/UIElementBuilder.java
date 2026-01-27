@@ -458,7 +458,7 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
         if (parentSelector != null) {
             if (!updateOnly) {
                 String path = getAppendPath();
-                if (path != null && path.endsWith(".ui")) {
+                if (path != null && path.endsWith(".ui") && !hasCustomInlineContent()) {
                     HyUIPlugin.getLog().logInfo("Appending UI file: " + path + " to " + parentSelector);
                     commands.append(parentSelector, path);
 

@@ -330,12 +330,9 @@ public class ButtonBuilder extends UIElementBuilder<ButtonBuilder> implements
     }
 
     private boolean isTextButtonElement() {
-        return UIElements.TEXT_BUTTON.equals(elementPath)
-                || UIElements.SECONDARY_TEXT_BUTTON.equals(elementPath)
-                || UIElements.SMALL_SECONDARY_TEXT_BUTTON.equals(elementPath)
-                || UIElements.TERTIARY_TEXT_BUTTON.equals(elementPath)
-                || UIElements.SMALL_TERTIARY_TEXT_BUTTON.equals(elementPath)
-                || UIElements.CANCEL_TEXT_BUTTON.equals(elementPath);
+        var typeSelector = getButtonTypeSelector(elementPath);
+        
+        return typeSelector.contains("TextButton");
     }
 
     private boolean isBackButton() {

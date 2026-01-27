@@ -180,10 +180,10 @@ public class ProgressBarBuilder extends UIElementBuilder<ProgressBarBuilder> imp
             sb.append("Value: 0.0; ");
             sb.append("} ");
         } else {
-            sb.append("Background: \"../../Common/ProgressBar.png\"; ");
+            sb.append("Background: \"Common/ProgressBar.png\"; ");
             sb.append("ProgressBar #HyUIProgressBar { ");
-            String inlineBarTexturePath = barTexturePath != null ? barTexturePath : "../../Common/ProgressBarFill.png";
-            String inlineEffectTexturePath = effectTexturePath != null ? effectTexturePath : "../../Common/ProgressBarEffect.png";
+            String inlineBarTexturePath = barTexturePath != null ? barTexturePath : "Common/ProgressBarFill.png";
+            String inlineEffectTexturePath = effectTexturePath != null ? effectTexturePath : "Common/ProgressBarEffect.png";
             sb.append("BarTexturePath: \"").append(inlineBarTexturePath).append("\"; ");
             sb.append("EffectTexturePath: \"").append(inlineEffectTexturePath).append("\"; ");
             sb.append("Value: 0.0; ");
@@ -272,14 +272,14 @@ public class ProgressBarBuilder extends UIElementBuilder<ProgressBarBuilder> imp
         if (value != 0.0f) {
             commands.set(selector + ".Value", value);
         }
-        if (barTexturePath != null) {
+/*      if (barTexturePath != null) {
             commands.set(selector + ".BarTexturePath", barTexturePath);
         }
         if (effectTexturePath != null) {
             if (!circular) {
                 commands.set(selector + ".EffectTexturePath", effectTexturePath);
             }
-        }
+        }*/
         if (effectWidth != null) {
             if (!circular) {
                 commands.set(selector + ".EffectWidth", effectWidth);

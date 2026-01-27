@@ -1,5 +1,9 @@
 ### HyUI Changelog
 
+#### 0.5.6 - 28 Jan 2026
+- Fix button text not being set.
+- Fix progressbar texture paths not working as expected.
+
 #### 0.5.5 - 27 Jan 2026
 - Update validation rules according to schema.
 - Add helper method to cast a value to a particular type (UIContext.getValueAs).

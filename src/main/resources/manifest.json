@@ -1,7 +1,7 @@
 {
     "Group": "Ellie",
     "Name": "HyUI",
-    "Version": "0.5.5",
+    "Version": "0.5.6",
     "Description": "A library for mods that helps build GUIs faster and better.",
     "Authors": [
         {
