@@ -102,5 +102,5 @@ tasks.named('shadowJar', ShadowJar) {
     // Exclude some stuff we really don't need.
     exclude 'Common/UI/Custom/Pages/*.html'
     exclude 'Common/UI/Custom/*.png'
-    exclude 'au/ellie/hyui/commands/**'
+    //exclude 'au/ellie/hyui/commands/**'
 }
