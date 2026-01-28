@@ -1,5 +1,9 @@
 ### Page Building
 
+Please us the following link for updated documentation:
+
+https://hyui.gitbook.io/docs/
+
 Pages in HyUI are full-screen user interfaces that typically handle player interaction while the game is paused or the cursor is active. They are managed via the `PageBuilder`.
 
 #### Content Sources

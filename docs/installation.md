@@ -1,5 +1,9 @@
 ### Installation Guide
 
+Please us the following link for updated documentation:
+
+https://hyui.gitbook.io/docs/
+
 HyUI is designed to be easily integrated into your Hytale modding project.
 
 #### Quick Start: Example Project

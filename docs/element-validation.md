@@ -1,5 +1,9 @@
 # Element Validation
 
+Please us the following link for updated documentation:
+
+https://hyui.gitbook.io/docs/
+
 This document describes the property validation rules for `.ui` files and HyUI builders. 
 It mirrors the Hytale UI Parser `ElementType` and `TypeType` definitions, and includes HyUI-only notes where applicable.
 

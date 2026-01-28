@@ -1,5 +1,9 @@
 ### Template Processor
 
+Please us the following link for updated documentation:
+
+https://hyui.gitbook.io/docs/
+
 The Template Processor lets you pre-process HYUIML with variables, filters, and reusable components before HyUI parses it into builders. The showcase command is a good reference: `src/main/java/au/ellie/hyui/commands/HyUIShowcaseCommand.java`.
 
 #### Variable Interpolation

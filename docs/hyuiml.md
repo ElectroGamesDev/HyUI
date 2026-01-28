@@ -1,5 +1,9 @@
 ### HYUIML (HyUI Markup Language)
 
+Please us the following link for updated documentation:
+
+https://hyui.gitbook.io/docs/
+
 HYUIML is an HTML-like markup language for defining Hytale UIs using a familiar syntax. It is parsed by HyUI and converted into the fluent builder API calls under the hood.
 
 #### Basic Usage

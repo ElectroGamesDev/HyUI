@@ -218,7 +218,7 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                     ctx.getById("label", LabelBuilder.class).ifPresent(lb -> { 
                         lb.withText("ClicksA: " + String.valueOf(clicks.incrementAndGet()));
                         HyUIPlugin.getLog().logInfo("Found label builder.");
-                        //ctx.updatePage(true);
+                        ctx.updatePage(true);
                         /*for (String s : ctx.getCommandLog()) {
                             HyUIPlugin.getLog().logInfo(s);
                         }

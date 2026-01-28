@@ -1,5 +1,9 @@
 ### UI Elements
 
+Please us the following link for updated documentation:
+
+https://hyui.gitbook.io/docs/
+
 This page provides examples of common UI element combinations and configurations in HyUI.
 
 ### Dropdown Box Example

@@ -1,5 +1,9 @@
 ### HUD Building
 
+Please us the following link for updated documentation:
+
+https://hyui.gitbook.io/docs/
+
 HUDs (Heads-Up Displays) in HyUI are persistent UI elements that stay on the player's screen. They are managed via the `HudBuilder`.
 
 #### Content Sources
