@@ -9,6 +9,7 @@ public class UIElements {
     public static final String COLOR_PICKER = "ColorPicker";
     public static final String BUTTON = "Button";
     public static final String TEXT_FIELD = "TextField";
+    public static final String MULTILINE_TEXT_FIELD = "MultilineTextField";
     public static final String SLIDER = "Slider";
     public static final String PROGRESS_BAR = "ProgressBar";
     public static final String ITEM_ICON = "ItemIcon";
@@ -38,7 +39,7 @@ public class UIElements {
     public static final String TIMER_LABEL = "TimerLabel";
     public static final String TAB_NAVIGATION = "TabNavigation";
     public static final Set<String> NORMAL_ELEMENTS = Set.of(
-            GROUP, LABEL, COLOR_PICKER, BUTTON, TEXT_FIELD, "Input", "CheckBox", "Slider", ITEM_SLOT, "Text", PROGRESS_BAR, ITEM_ICON, SPRITE, ITEM_GRID, TIMER_LABEL, TAB_NAVIGATION
+            GROUP, LABEL, COLOR_PICKER, BUTTON, TEXT_FIELD, MULTILINE_TEXT_FIELD, "Input", "CheckBox", "Slider", ITEM_SLOT, "Text", PROGRESS_BAR, ITEM_ICON, SPRITE, ITEM_GRID, TIMER_LABEL, TAB_NAVIGATION
     );
 
     public static final Set<String> MACRO_ELEMENTS = Set.of(

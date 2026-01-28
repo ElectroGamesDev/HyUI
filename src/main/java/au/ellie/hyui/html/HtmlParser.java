@@ -29,6 +29,7 @@ public class HtmlParser {
         registerHandler(new DivHandler());
         registerHandler(new LabelHandler());
         registerHandler(new InputHandler());
+        registerHandler(new TextAreaHandler());
         registerHandler(new ButtonHandler());
         registerHandler(new ImgHandler());
         registerHandler(new HyvatarHandler());

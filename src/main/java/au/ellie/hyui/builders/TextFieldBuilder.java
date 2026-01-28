@@ -3,9 +3,12 @@ package au.ellie.hyui.builders;
 import au.ellie.hyui.HyUIPlugin;
 import au.ellie.hyui.events.UIContext;
 import au.ellie.hyui.events.UIEventActions;
+import au.ellie.hyui.elements.BackgroundSupported;
+import au.ellie.hyui.elements.ScrollbarStyleSupported;
 import au.ellie.hyui.elements.UIElements;
 import au.ellie.hyui.theme.Theme;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
+import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
@@ -17,7 +20,8 @@ import java.util.function.Consumer;
 /**
  * Builder for creating text field UI elements. Also known as Text Input elements.
  */
-public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder> {
+public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder>
+        implements BackgroundSupported<TextFieldBuilder>, ScrollbarStyleSupported<TextFieldBuilder> {
     private String value;
     private String placeholderText;
     private Integer maxLength;
@@ -26,6 +30,13 @@ public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder> {
     private Boolean password;
     private String passwordChar;
     private Boolean autoGrow;
+    private HyUIPatchStyle background;
+    private String backgroundStyleReference;
+    private String backgroundStyleDocument;
+    private String scrollbarStyleReference;
+    private String scrollbarStyleDocument;
+    private HyUIPadding contentPadding;
+    private boolean isMultiline;
 
     /**
      * DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING.
@@ -66,12 +77,30 @@ public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder> {
         }
     }
 
+    private TextFieldBuilder(Theme theme, String elementPath, String typeSelector) {
+        super(theme, elementPath, typeSelector);
+        withWrappingGroup(true);
+    }
+
     /**
      * Creates a text input field with the game theme.
      * @return A new TextFieldBuilder instance configured for text input.
      */
     public static TextFieldBuilder textInput() {
         return new TextFieldBuilder(Theme.GAME_THEME, UIElements.MACRO_TEXT_FIELD);
+    }
+
+    /**
+     * Creates a multiline text input field with the game theme.
+     * @return A new TextFieldBuilder instance configured for multiline input.
+     */
+    public static TextFieldBuilder multilineTextField() {
+        TextFieldBuilder builder = new TextFieldBuilder(Theme.GAME_THEME,
+                UIElements.MULTILINE_TEXT_FIELD,
+                "#HyUIMultilineTextField");
+        builder.withUiFile("Pages/Elements/MultilineTextField.ui");
+        builder.isMultiline = true;
+        return builder;
     }
 
     /**
@@ -165,6 +194,75 @@ public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder> {
     }
 
     /**
+     * Sets the background patch style for the text field.
+     * @param background The background patch style to use.
+     * @return This TextFieldBuilder instance for method chaining.
+     */
+    @Override
+    public TextFieldBuilder withBackground(HyUIPatchStyle background) {
+        if (!isMultiline) return this;
+        this.background = background;
+        return this;
+    }
+
+    @Override
+    public HyUIPatchStyle getBackground() {
+        return this.background;
+    }
+
+    /**
+     * Sets the background style reference for the text field.
+     * @param styleReference The style reference (e.g., "InputBoxBackground").
+     * @return This TextFieldBuilder instance for method chaining.
+     */
+    public TextFieldBuilder withBackground(String styleReference) {
+        if (!isMultiline) return this;
+        return withBackground("Common.ui", styleReference);
+    }
+
+    /**
+     * Sets the background style reference for the text field from a document.
+     * @param document The style document (e.g., "Common.ui").
+     * @param styleReference The style reference (e.g., "InputBoxBackground").
+     * @return This TextFieldBuilder instance for method chaining.
+     */
+    public TextFieldBuilder withBackground(String document, String styleReference) {
+        if (!isMultiline) return this;
+        this.backgroundStyleDocument = document;
+        this.backgroundStyleReference = styleReference;
+        return this;
+    }
+
+    /**
+     * Sets the padding used for the text contents.
+     * @param padding The content padding to apply.
+     * @return This TextFieldBuilder instance for method chaining.
+     */
+    public TextFieldBuilder withContentPadding(HyUIPadding padding) {
+        if (!isMultiline) return this;
+        this.contentPadding = padding;
+        return this;
+    }
+
+    @Override
+    public TextFieldBuilder withScrollbarStyle(String document, String styleReference) {
+        if (!isMultiline) return this;
+        this.scrollbarStyleDocument = document;
+        this.scrollbarStyleReference = styleReference;
+        return this;
+    }
+
+    @Override
+    public String getScrollbarStyleReference() {
+        return scrollbarStyleReference;
+    }
+
+    @Override
+    public String getScrollbarStyleDocument() {
+        return scrollbarStyleDocument;
+    }
+
+    /**
      * Adds an event listener to the text field builder for handling a specific type of UI event.
      *
      * @param type The type of the event to bind the listener to. This specifies what kind of UI event 
@@ -250,6 +348,21 @@ public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder> {
             commands.set(selector + ".AutoGrow", autoGrow);
         }
 
+        if (backgroundStyleReference != null && backgroundStyleDocument != null) {
+            commands.set(selector + ".Background", Value.ref(backgroundStyleDocument, backgroundStyleReference));
+        } else {
+            applyBackground(commands, selector);
+        }
+
+        applyScrollbarStyle(commands, selector);
+
+        if (contentPadding != null) {
+            if (contentPadding.getLeft() != null) commands.set(selector + ".ContentPadding.Left", contentPadding.getLeft());
+            if (contentPadding.getTop() != null) commands.set(selector + ".ContentPadding.Top", contentPadding.getTop());
+            if (contentPadding.getRight() != null) commands.set(selector + ".ContentPadding.Right", contentPadding.getRight());
+            if (contentPadding.getBottom() != null) commands.set(selector + ".ContentPadding.Bottom", contentPadding.getBottom());
+        }
+
         if (hyUIStyle == null && style != null) {
             HyUIPlugin.getLog().logInfo("Setting Style: " + style + " for " + selector);
             commands.set(selector + ".Style", style);
@@ -257,9 +370,12 @@ public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder> {
         if (listeners.isEmpty()) {
             // To handle data back to the .getValue, we need to add at least one listener.
             addEventListener(CustomUIEventBindingType.ValueChanged, (_, _) -> {});
-            addEventListener(CustomUIEventBindingType.FocusLost, (_, _) -> {});
-            addEventListener(CustomUIEventBindingType.FocusGained, (_, _) -> {});
-            addEventListener(CustomUIEventBindingType.Validating, (_, _) -> {});
+            if (!isMultiline) {
+                addEventListener(CustomUIEventBindingType.FocusLost, (_, _) -> {});
+                addEventListener(CustomUIEventBindingType.FocusGained, (_, _) -> {});
+                // Causes target element in custom UI event binding is not marked as bindable.
+                addEventListener(CustomUIEventBindingType.Validating, (_, _) -> {});
+            }
         }
         listeners.forEach(listener -> {
             if (listener.type() == CustomUIEventBindingType.ValueChanged ||

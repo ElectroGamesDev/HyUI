@@ -14,6 +14,8 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractAsyncCommand;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.ui.ItemGridSlot;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -263,10 +265,9 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
         
         PageBuilder builder = PageBuilder.detachedPage()
                 .loadHtml("Pages/ItemGridTest.html")
-                .addEventListener("itemgrid", CustomUIEventBindingType.SlotMouseDragCompleted, (data, ctx) -> {
-                    var eventData = (SlotMouseDragCompletedEventData)data;
-                    playerRef.sendMessage(Message.raw("Mouse drag completed on item grid: " + eventData.getSlotIndex()));
-                    playerRef.sendMessage(Message.raw("Mouse drag completed on item grid: " + eventData.getItemStackId()));
+                .addEventListener("itemgrid", CustomUIEventBindingType.SlotMouseDragCompleted, SlotMouseDragCompletedEventData.class, (data, ctx) -> {
+                    playerRef.sendMessage(Message.raw("Mouse drag completed on item grid: " + data.getSlotIndex()));
+                    playerRef.sendMessage(Message.raw("Mouse drag completed on item grid: " + data.getItemStackId()));
                 })
                 .addEventListener("test", CustomUIEventBindingType.Activating, (_, context) -> {
                     var a = context.getValue("price-input", Double.class);
@@ -274,6 +275,10 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                 })
                 .withLifetime(CustomPageLifetime.CanDismiss);
         
+        builder.getById("itemgrid", ItemGridBuilder.class).ifPresent(ig -> {
+            ig.addSlot(new ItemGridSlot(new ItemStack("Ore_Gold", 25)));
+            ig.addSlot(new ItemGridSlot(new ItemStack("Ore_Iron", 25)));
+        });
         for (CustomUIEventBindingType typeName : CustomUIEventBindingType.values()) {
             builder.addEventListener("itemgrid", typeName, (data, ctx) -> {
                 playerRef.sendMessage(Message.raw("Event triggered: " + typeName.name()));
@@ -369,6 +374,21 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                                 .withValue("Test Value")
                                 .addEventListener(CustomUIEventBindingType.ValueChanged, (val) -> {
                                     playerRef.sendMessage(Message.raw("Text Field changed to: " + val));
+                                }))
+                        .addChild(TextFieldBuilder.multilineTextField()
+                                .withId("MyMultilineTextField")
+                                .withPlaceholderText("%client.feedback.field.description.placeholder")
+                                .withStyle(new HyUIStyle().withStyleReference("Common.ui", "DefaultInputFieldStyle"))
+                                .withPlaceholderStyle(new HyUIStyle().withStyleReference("Common.ui", "DefaultInputFieldPlaceholderStyle"))
+                                .withBackground("Common.ui", "InputBoxBackground")
+                                .withScrollbarStyle("Common.ui", "DefaultScrollbarStyle")
+                                .withContentPadding(HyUIPadding.symmetric(8, 10))
+                                .withMaxVisibleLines(8)
+                                .withMaxLength(1000)
+                                .withAnchor(new HyUIAnchor().setTop(5).setHeight(150))
+                                .withAutoGrow(false)
+                                .addEventListener(CustomUIEventBindingType.ValueChanged, (val) -> {
+                                    playerRef.sendMessage(Message.raw("Multiline text updated: " + val));
                                 }))
                         .addChild(new CheckBoxBuilder()
                                 .withId("MyCheckBox")

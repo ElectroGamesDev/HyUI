@@ -38,6 +38,7 @@ PageBuilder.pageForPlayer(playerRef)
 | `<button>`                | `ButtonBuilder` | Standard buttons. Use `class="back-button"`, `class="secondary-button"`, `class="small-secondary-button"`, `class="small-tertiary-button"`, or `class="tertiary-button"` for themed variants. Use `class="custom-textbutton"` or `class="custom-button"` for custom buttons. |
 | `<input type="text">`     | `TextFieldBuilder` | Text input fields. Requires a `value` to set to track values on events.                                                                                                                       |
 | `<input type="password">` | `TextFieldBuilder` | Masked password input fields. Requires a `value` to set to track values on events.                                                                                                            |
+| `<textarea>`              | `TextFieldBuilder` | Multiline text input. Maps to `TextFieldBuilder.multilineTextField()`. Supports `rows` for max visible lines and `data-hyui-*` attributes for multiline properties.                            |
 | `<input type="number">`   | `NumberFieldBuilder` | Numeric input fields. Requires a `value` to set to track values on events.                                                                                                                    |
 | `<input type="range">`    | `SliderBuilder` | Sliders. Requires a `value` to set to track values on events.                                                                                                                                 |
 | `<input type="checkbox">` | `CheckBoxBuilder` | Toggle switches.                                                                                                                                                                              |
@@ -74,6 +75,12 @@ HYUIML supports several standard and custom attributes:
 *   `data-hyui-item-id`: In-game item ID for the icon to reflect.
 *   `data-hyui-show-quality-background`: Specific to `<span class="item-slot">`, toggles item quality background.
 *   `data-hyui-show-quantity`: Specific to `<span class="item-slot">`, toggles the item quantity display.
+*   `data-hyui-max-visible-lines`: Specific to `<textarea>`, overrides the max visible lines.
+*   `data-hyui-auto-grow`: Specific to `<textarea>`, enables multiline auto-grow.
+*   `data-hyui-scrollbar-style`: Specific to `<textarea>`, sets the scrollbar style reference (`"Common.ui" "DefaultScrollbarStyle"`).
+*   `data-hyui-background`: Specific to `<textarea>`, sets the background reference (`"Common.ui" "InputBoxBackground"`).
+*   `data-hyui-placeholder-style`: Specific to `<textarea>`, sets the placeholder style reference (`"Common.ui" "DefaultInputFieldPlaceholderStyle"`).
+*   `data-hyui-content-padding`: Specific to `<textarea>`, sets content padding (`(Horizontal:10,Vertical:8)`).
 *   `data-hyui-max-decimal-places`: Specific to `<input type="number">`, sets the maximum decimal places.
 *   `data-hyui-bar-texture-path`: Path to the progress bar's fill texture.
 *   `data-hyui-effect-texture-path`: Path to the progress bar's effect texture.

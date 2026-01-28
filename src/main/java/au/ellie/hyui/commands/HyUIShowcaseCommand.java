@@ -343,6 +343,8 @@ public class HyUIShowcaseCommand extends AbstractAsyncCommand {
                                         <option value="Entry2">Second Entry</option>
                                         <option value="Entry3">Third Entry</option>
                                     </select>
+                                    <p style="color: #888888; font-size: 18; anchor-height: 18;">Dropdown</p>
+                                    <textarea rows="20" maxlength="1000" placeholder="Hello" style="anchor-height: 60;"></textarea>
                                 </div>
                                 <div style="background-color: #2a2a3e; padding: 10; flex-weight: 1; flex-direction: column;">
                                     <p style="color: #888888; font-size: 18; anchor-height: 18;">Range</p>
