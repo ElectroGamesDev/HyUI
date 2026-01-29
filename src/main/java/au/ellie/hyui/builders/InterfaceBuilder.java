@@ -13,6 +13,9 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -79,6 +82,23 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
     }
     
     private String loadHtmlFromResources(String resourceFileName) {
+        String normalized = resourceFileName.startsWith("/") ? resourceFileName.substring(1) : resourceFileName;
+        List<Path> candidatePaths = List.of(
+                Paths.get("src/main/resources").resolve(normalized),
+                Paths.get("..", "src", "main", "resources").resolve(normalized),
+                Paths.get("build/resources/main").resolve(normalized),
+                Paths.get("..", "build", "resources", "main").resolve(normalized),
+                Paths.get(normalized)
+        );
+        for (Path path : candidatePaths) {
+            if (Files.isRegularFile(path)) {
+                try {
+                    return Files.readString(path, StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to load HTML from file: " + path, e);
+                }
+            }
+        }
         try (InputStream inputStream = InterfaceBuilder.class.getResourceAsStream(resourceFileName)) {
             if (inputStream == null) {
                 throw new IllegalArgumentException("Resource not found: " + resourceFileName);
