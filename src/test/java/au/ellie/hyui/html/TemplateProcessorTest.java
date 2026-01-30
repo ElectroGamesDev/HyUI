@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -272,7 +271,7 @@ class TemplateProcessorTest {
 
             processor
                     .setVariable("enabled", false)
-                    .setVariable("secret", (Supplier<Object>) () -> {
+                    .setVariable("secret", () -> {
                         evaluations.incrementAndGet();
                         return "SHOULD NOT HAPPEN";
                     });
@@ -293,7 +292,7 @@ class TemplateProcessorTest {
 
             processor
                     .setVariable("enabled", true)
-                    .setVariable("value", (Supplier<Object>) () -> {
+                    .setVariable("value", () -> {
                         evaluations.incrementAndGet();
                         return "OK";
                     });

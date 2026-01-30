@@ -73,7 +73,6 @@ public class HudBuilder extends InterfaceBuilder<HudBuilder> {
      * Shows the HUD for the already existing player reference.
      * The playerRef must already be set, using {@code HudBuilder.hudForPlayer(PlayerRef ref)}
      * 
-     * @param store The entity store containing player data.
      * @return The created HyUIHud instance.
      */
     public HyUIHud show() {
