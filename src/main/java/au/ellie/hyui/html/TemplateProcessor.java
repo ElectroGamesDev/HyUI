@@ -7,6 +7,7 @@ import au.ellie.hyui.builders.UIElementBuilder;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -818,7 +819,7 @@ public class TemplateProcessor {
                 continue;
             }
             try {
-                if (!field.canAccess(item)) {
+                if (!Modifier.isStatic(field.getModifiers()) && !field.canAccess(item)) {
                     field.setAccessible(true);
                 }
                 values.put(field.getName(), field.get(item));
@@ -860,11 +861,11 @@ public class TemplateProcessor {
                 continue;
             }
             try {
-                if (!field.canAccess(item)) {
+                if (!Modifier.isStatic(field.getModifiers()) && !field.canAccess(item)) {
                     field.setAccessible(true);
                 }
                 values.put(field.getName(), field.get(item));
-            } catch (IllegalAccessException ignored) {
+            } catch (IllegalAccessException | IllegalArgumentException ignored ) {
                 // Skip inaccessible fields.
             }
         }
