@@ -5,7 +5,7 @@ $C.@Container #HyUIContainer {
     #Title {
       Group {
         $C.@Title #HyUIContainerTitle {
-          @Text = "HyUI Container";
+          @Text = "";
         }
       }
     }
