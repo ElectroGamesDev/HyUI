@@ -1,0 +1,5 @@
+* text=auto
+
+# Handling for Java files
+*.java text
+*.jar -text

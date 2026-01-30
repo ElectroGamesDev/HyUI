@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,7 +61,7 @@ public class TemplateProcessor {
     private static final String ELSE_TAG = "{{else}}";
     private static final int MAX_COMPONENT_DEPTH = 20;
 
-    private final Map<String, Object> variables = new HashMap<>();
+    private final Map<String, Supplier<Object>> variables = new HashMap<>();
     private final Map<String, String> components = new HashMap<>();
     private final Map<String, Function<String, String>> filters = new HashMap<>();
     private ValueResolver valueResolver;
@@ -83,18 +84,6 @@ public class TemplateProcessor {
     }
 
     /**
-     * Sets a template variable.
-     *
-     * @param name  Variable name (without $)
-     * @param value Variable value
-     * @return This processor for chaining
-     */
-    public TemplateProcessor setVariable(String name, String value) {
-        variables.put(name, value);
-        return this;
-    }
-
-    /**
      * Sets a template variable from any object.
      *
      * @param name  Variable name (without $)
@@ -102,6 +91,18 @@ public class TemplateProcessor {
      * @return This processor for chaining
      */
     public TemplateProcessor setVariable(String name, Object value) {
+        variables.put(name, () -> value);
+        return this;
+    }
+
+    /**
+     * Sets a template variable from any object.
+     *
+     * @param name  Variable name (without $)
+     * @param value Supplier that provides the variable value
+     * @return This processor for chaining
+     */
+    public TemplateProcessor setVariable(String name, Supplier<Object> value) {
         variables.put(name, value);
         return this;
     }
@@ -112,9 +113,12 @@ public class TemplateProcessor {
      * @param vars Map of variable names to values
      * @return This processor for chaining
      */
+    @SuppressWarnings("unchecked")
     public TemplateProcessor setVariables(Map<String, ?> vars) {
         for (Map.Entry<String, ?> entry : vars.entrySet()) {
-            setVariable(entry.getKey(), entry.getValue());
+            var value = entry.getValue();
+
+            setVariable(entry.getKey(), entry.getValue() instanceof Supplier ? (Supplier<Object>) value : () -> value);
         }
         return this;
     }
@@ -182,7 +186,7 @@ public class TemplateProcessor {
         }
     }
 
-    private String processTemplate(String template, Map<String, Object> scope, int componentDepth) {
+    private String processTemplate(String template, Map<String, Supplier<Object>> scope, int componentDepth) {
         String result = template;
 
         // Process control structures first so false branches aren't expanded.
@@ -202,7 +206,7 @@ public class TemplateProcessor {
         return result;
     }
 
-    private String processVariables(String template, Map<String, Object> scope) {
+    private String processVariables(String template, Map<String, Supplier<Object>> scope) {
         Matcher matcher = VARIABLE_PATTERN.matcher(template);
         StringBuilder result = new StringBuilder();
 
@@ -232,7 +236,7 @@ public class TemplateProcessor {
         return result.toString();
     }
 
-    private String processEachBlocks(String template, Map<String, Object> scope, int componentDepth) {
+    private String processEachBlocks(String template, Map<String, Supplier<Object>> scope, int componentDepth) {
         StringBuilder result = new StringBuilder();
         int index = 0;
 
@@ -263,9 +267,14 @@ public class TemplateProcessor {
             Iterable<?> items = toIterable(listObj);
 
             for (Object item : items) {
-                Map<String, Object> childScope = new HashMap<>(scope);
-                childScope.putAll(extractModelVariables(item));
-                childScope.put("item", item);
+                Map<String, Supplier<Object>> childScope = new HashMap<>(scope);
+
+                // Ignore primitive types for model variable extraction
+                if (!item.getClass().isPrimitive()) {
+                    childScope.putAll(extractModelVariables(item));
+                }
+
+                childScope.put("item", () -> item);
                 result.append(processTemplate(inner, childScope, componentDepth));
             }
 
@@ -275,7 +284,7 @@ public class TemplateProcessor {
         return result.toString();
     }
 
-    private String processIfBlocks(String template, Map<String, Object> scope, int componentDepth) {
+    private String processIfBlocks(String template, Map<String, Supplier<Object>> scope, int componentDepth) {
         StringBuilder result = new StringBuilder();
         int index = 0;
 
@@ -322,7 +331,7 @@ public class TemplateProcessor {
         return result.toString();
     }
 
-    private String processComponents(String template, Map<String, Object> scope, int componentDepth) {
+    private String processComponents(String template, Map<String, Supplier<Object>> scope, int componentDepth) {
         StringBuilder result = new StringBuilder();
         int index = 0;
 
@@ -413,7 +422,7 @@ public class TemplateProcessor {
         return params;
     }
 
-    private boolean evaluateCondition(String rawCondition, Map<String, Object> scope) {
+    private boolean evaluateCondition(String rawCondition, Map<String, Supplier<Object>> scope) {
         String condition = rawCondition != null ? rawCondition.trim() : "";
         if (condition.isEmpty()) {
             return false;
@@ -422,7 +431,7 @@ public class TemplateProcessor {
         return evaluateLogical(condition, scope);
     }
 
-    private boolean evaluateLogical(String condition, Map<String, Object> scope) {
+    private boolean evaluateLogical(String condition, Map<String, Supplier<Object>> scope) {
         for (String orPart : splitByOperator(condition, "||")) {
             if (evaluateAnd(orPart, scope)) {
                 return true;
@@ -431,7 +440,7 @@ public class TemplateProcessor {
         return false;
     }
 
-    private boolean evaluateAnd(String condition, Map<String, Object> scope) {
+    private boolean evaluateAnd(String condition, Map<String, Supplier<Object>> scope) {
         for (String andPart : splitByOperator(condition, "&&")) {
             if (!evaluateUnary(andPart, scope)) {
                 return false;
@@ -440,7 +449,7 @@ public class TemplateProcessor {
         return true;
     }
 
-    private boolean evaluateUnary(String condition, Map<String, Object> scope) {
+    private boolean evaluateUnary(String condition, Map<String, Supplier<Object>> scope) {
         String trimmed = condition.trim();
         if (trimmed.startsWith("!")) {
             return !evaluateUnary(trimmed.substring(1), scope);
@@ -449,7 +458,7 @@ public class TemplateProcessor {
         return evaluateComparison(trimmed, scope);
     }
 
-    private boolean evaluateComparison(String condition, Map<String, Object> scope) {
+    private boolean evaluateComparison(String condition, Map<String, Supplier<Object>> scope) {
         Matcher containsMatcher = Pattern.compile("(.+?)\\s+contains\\s+(.+)").matcher(condition);
         if (containsMatcher.matches()) {
             Object left = resolveOperand(containsMatcher.group(1).trim(), scope);
@@ -469,7 +478,7 @@ public class TemplateProcessor {
         return isTruthy(value);
     }
 
-    private Object resolveOperand(String token, Map<String, Object> scope) {
+    private Object resolveOperand(String token, Map<String, Supplier<Object>> scope) {
         if (token == null) {
             return null;
         }
@@ -632,7 +641,7 @@ public class TemplateProcessor {
         return parts;
     }
 
-    private boolean hasVariable(Map<String, Object> scope, String name) {
+    private boolean hasVariable(Map<String, Supplier<Object>> scope, String name) {
         if (name == null || name.isBlank()) {
             return false;
         }
@@ -655,7 +664,7 @@ public class TemplateProcessor {
         return false;
     }
 
-    private Object resolveVariable(Map<String, Object> scope, String name) {
+    private Object resolveVariable(Map<String, Supplier<Object>> scope, String name) {
         if (name == null || name.isBlank()) {
             return null;
         }
@@ -668,7 +677,7 @@ public class TemplateProcessor {
         }
 
         if (scope.containsKey(name)) {
-            return scope.get(name);
+            return scope.get(name).get();
         }
 
         Optional<Object> resolved = resolveDynamicValue(name);
@@ -687,7 +696,7 @@ public class TemplateProcessor {
             return null;
         }
 
-        Object current = scope.get(first);
+        Object current = scope.get(first).get();
         for (int i = 1; i < path.length; i++) {
             if (current == null) {
                 return null;
@@ -799,8 +808,8 @@ public class TemplateProcessor {
         return min == Integer.MAX_VALUE ? -1 : min;
     }
 
-    private Map<String, Object> extractModelVariables(Object item) {
-        Map<String, Object> values = new HashMap<>();
+    private Map<String, Supplier<Object>> extractModelVariables(Object item) {
+        Map<String, Supplier<Object>> values = new HashMap<>();
         if (item == null) {
             return values;
         }
@@ -808,7 +817,8 @@ public class TemplateProcessor {
         if (item instanceof Map<?, ?> map) {
             for (Map.Entry<?, ?> entry : map.entrySet()) {
                 if (entry.getKey() instanceof String key) {
-                    values.put(key, entry.getValue());
+                    var value = entry.getValue();
+                    values.put(key, () -> value);
                 }
             }
             return values;
@@ -839,16 +849,24 @@ public class TemplateProcessor {
         return values;
     }
 
-    private void extractVarsFromField(Object item, Map<String, Object> values, Field field) {
+    private void extractVarsFromField(Object item, Map<String, Supplier<Object>> values, Field field) {
         try {
             field.setAccessible(true);
-            values.put(field.getName(), field.get(Modifier.isStatic(field.getModifiers()) ? null : item));
-        } catch (IllegalAccessException | IllegalArgumentException ignored ) {
-            // Skip inaccessible fields.
+        } catch (Exception ignored) {
+            // For whatever reason we can't access it, ignore the field.
+            return;
         }
+
+        values.put(field.getName(), () -> {
+            try {
+                return field.get(Modifier.isStatic(field.getModifiers()) ? null : item);
+            } catch (IllegalAccessException | IllegalArgumentException ignored) {
+                return "";
+            }
+        });
     }
 
-    private void extractVarsFromMethod(Object item, Map<String, Object> values, Method method) {
+    private void extractVarsFromMethod(Object item, Map<String, Supplier<Object>> values, Method method) {
         if (method.getParameterCount() != 0) {
             return;
         }
@@ -867,10 +885,18 @@ public class TemplateProcessor {
         if (propName != null && !values.containsKey(propName)) {
             try {
                 method.setAccessible(true);
-                values.put(propName, method.invoke(Modifier.isStatic(method.getModifiers()) ? null : item));
             } catch (Exception ignored) {
-                // Skip static getters that throw.
+                // For whatever reason we can't access it, ignore the method.
+                return;
             }
+
+            values.put(propName, () -> {
+                try {
+                    return method.invoke(Modifier.isStatic(method.getModifiers()) ? null : item);
+                } catch (Exception ignored) {
+                    return "";
+                }
+            });
         }
     }
 
