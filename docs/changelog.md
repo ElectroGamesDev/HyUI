@@ -1,4 +1,7 @@
 ### HyUI Changelog
+#### 0.5.10 - 30 Jan 2026
+* Fix field access checks.
+
 #### 0.5.9 - 30 Jan 2026
 * Fix tab navigation builder not supporting template runtime interactions.
 * Add scrollbar style support for divs, same way as the textarea.

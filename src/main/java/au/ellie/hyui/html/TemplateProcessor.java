@@ -818,87 +818,60 @@ public class TemplateProcessor {
             if (values.containsKey(field.getName())) {
                 continue;
             }
-            try {
-                if (!Modifier.isStatic(field.getModifiers()) && !field.canAccess(item)) {
-                    field.setAccessible(true);
-                }
-                values.put(field.getName(), field.get(item));
-            } catch (IllegalAccessException | IllegalArgumentException ignored) {
-                // Skip inaccessible fields.
-            }
+            extractVarsFromField(item, values, field);
         }
 
         for (Method method : item.getClass().getMethods()) {
-            if (method.getParameterCount() != 0) {
-                continue;
-            }
-            String name = method.getName();
-            if (name.equals("getClass")) {
-                continue;
-            }
-
-            String propName = null;
-            if (name.startsWith("get") && name.length() > 3) {
-                propName = decapitalize(name.substring(3));
-            } else if (name.startsWith("is") && name.length() > 2) {
-                propName = decapitalize(name.substring(2));
-            }
-
-            if (propName != null && !values.containsKey(propName)) {
-                try {
-                    if (!method.canAccess(item)) {
-                        method.setAccessible(true);
-                    }
-                    values.put(propName, method.invoke(item));
-                } catch (Exception ignored) {
-                    // Skip getters that throw.
-                }
-            }
+            extractVarsFromMethod(item, values, method);
         }
 
         for (Field field : item.getClass().getDeclaredFields()) {
             if (field.isSynthetic() || values.containsKey(field.getName())) {
                 continue;
             }
-            try {
-                if (!Modifier.isStatic(field.getModifiers()) && !field.canAccess(item)) {
-                    field.setAccessible(true);
-                }
-                values.put(field.getName(), field.get(item));
-            } catch (IllegalAccessException | IllegalArgumentException ignored ) {
-                // Skip inaccessible fields.
-            }
+            extractVarsFromField(item, values, field);
         }
 
         for (Method method : item.getClass().getDeclaredMethods()) {
-            if (method.getParameterCount() != 0) {
-                continue;
-            }
-            String name = method.getName();
-            if (name.equals("getClass")) {
-                continue;
-            }
-
-            String propName = null;
-            if (name.startsWith("get") && name.length() > 3) {
-                propName = decapitalize(name.substring(3));
-            } else if (name.startsWith("is") && name.length() > 2) {
-                propName = decapitalize(name.substring(2));
-            }
-
-            if (propName != null && !values.containsKey(propName)) {
-                try {
-                    if (!method.canAccess(item)) {
-                        method.setAccessible(true);
-                    }
-                    values.put(propName, method.invoke(item));
-                } catch (Exception ignored) {
-                    // Skip getters that throw.
-                }
-            }
+            extractVarsFromMethod(item, values, method);
         }
 
         return values;
+    }
+
+    private void extractVarsFromField(Object item, Map<String, Object> values, Field field) {
+        try {
+            field.setAccessible(true);
+            values.put(field.getName(), field.get(Modifier.isStatic(field.getModifiers()) ? null : item));
+        } catch (IllegalAccessException | IllegalArgumentException ignored ) {
+            // Skip inaccessible fields.
+        }
+    }
+
+    private void extractVarsFromMethod(Object item, Map<String, Object> values, Method method) {
+        if (method.getParameterCount() != 0) {
+            return;
+        }
+        String name = method.getName();
+        if (name.equals("getClass")) {
+            return;
+        }
+
+        String propName = null;
+        if (name.startsWith("get") && name.length() > 3) {
+            propName = decapitalize(name.substring(3));
+        } else if (name.startsWith("is") && name.length() > 2) {
+            propName = decapitalize(name.substring(2));
+        }
+
+        if (propName != null && !values.containsKey(propName)) {
+            try {
+                method.setAccessible(true);
+                values.put(propName, method.invoke(Modifier.isStatic(method.getModifiers()) ? null : item));
+            } catch (Exception ignored) {
+                // Skip static getters that throw.
+            }
+        }
     }
 
     private Object getPropertyValue(Object target, String name) {
