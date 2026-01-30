@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -83,18 +84,6 @@ public class TemplateProcessor {
     }
 
     /**
-     * Sets a template variable.
-     *
-     * @param name  Variable name (without $)
-     * @param value Variable value
-     * @return This processor for chaining
-     */
-    public TemplateProcessor setVariable(String name, String value) {
-        variables.put(name, value);
-        return this;
-    }
-
-    /**
      * Sets a template variable from any object.
      *
      * @param name  Variable name (without $)
@@ -107,11 +96,24 @@ public class TemplateProcessor {
     }
 
     /**
+     * Sets a template variable from any object.
+     *
+     * @param name  Variable name (without $)
+     * @param value Supplier that provides the variable value
+     * @return This processor for chaining
+     */
+    public TemplateProcessor setVariable(String name, Supplier<?> value) {
+        variables.put(name, value);
+        return this;
+    }
+
+    /**
      * Sets multiple variables at once.
      *
      * @param vars Map of variable names to values
      * @return This processor for chaining
      */
+    @SuppressWarnings("unchecked")
     public TemplateProcessor setVariables(Map<String, ?> vars) {
         for (Map.Entry<String, ?> entry : vars.entrySet()) {
             setVariable(entry.getKey(), entry.getValue());
@@ -264,7 +266,12 @@ public class TemplateProcessor {
 
             for (Object item : items) {
                 Map<String, Object> childScope = new HashMap<>(scope);
-                childScope.putAll(extractModelVariables(item));
+
+                // Ignore primitive types for model variable extraction
+                if (!item.getClass().isPrimitive()) {
+                    childScope.putAll(extractModelVariables(item));
+                }
+
                 childScope.put("item", item);
                 result.append(processTemplate(inner, childScope, componentDepth));
             }
@@ -668,7 +675,8 @@ public class TemplateProcessor {
         }
 
         if (scope.containsKey(name)) {
-            return scope.get(name);
+            var value = scope.get(name);
+            return value instanceof Supplier<?> supplier ? supplier.get() : value;
         }
 
         Optional<Object> resolved = resolveDynamicValue(name);
@@ -688,6 +696,9 @@ public class TemplateProcessor {
         }
 
         Object current = scope.get(first);
+        if (current instanceof Supplier<?> supplier)
+            current = supplier.get();
+
         for (int i = 1; i < path.length; i++) {
             if (current == null) {
                 return null;
@@ -842,10 +853,18 @@ public class TemplateProcessor {
     private void extractVarsFromField(Object item, Map<String, Object> values, Field field) {
         try {
             field.setAccessible(true);
-            values.put(field.getName(), field.get(Modifier.isStatic(field.getModifiers()) ? null : item));
-        } catch (IllegalAccessException | IllegalArgumentException ignored ) {
-            // Skip inaccessible fields.
+        } catch (Exception ignored) {
+            // For whatever reason we can't access it, ignore the field.
+            return;
         }
+
+        values.put(field.getName(), (Supplier<Object>)() -> {
+            try {
+                return field.get(Modifier.isStatic(field.getModifiers()) ? null : item);
+            } catch (IllegalAccessException | IllegalArgumentException ignored) {
+                return "";
+            }
+        });
     }
 
     private void extractVarsFromMethod(Object item, Map<String, Object> values, Method method) {
@@ -867,10 +886,18 @@ public class TemplateProcessor {
         if (propName != null && !values.containsKey(propName)) {
             try {
                 method.setAccessible(true);
-                values.put(propName, method.invoke(Modifier.isStatic(method.getModifiers()) ? null : item));
             } catch (Exception ignored) {
-                // Skip static getters that throw.
+                // For whatever reason we can't access it, ignore the method.
+                return;
             }
+
+            values.put(propName, (Supplier<Object>)() -> {
+                try {
+                    return method.invoke(Modifier.isStatic(method.getModifiers()) ? null : item);
+                } catch (Exception ignored) {
+                    return "";
+                }
+            });
         }
     }
 

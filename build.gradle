@@ -1,10 +1,22 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
     id 'java'
-    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.3'
-    id("com.gradleup.shadow") version "9.3.1"
-    id("app.ultradev.hytalegradle") version "2.0.2"
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.idea.ext)
+    alias(libs.plugins.hytalegradle)
+}
+
+dependencies {
+    // Html parsing
+    shadow libs.jsoup
+    implementation libs.jsoup
+
+    // Unit testing
+    testImplementation libs.junit
+    testRuntimeOnly libs.junit.launcher
+}
+
+repositories {
+    mavenCentral()
 }
 
 java {
@@ -18,63 +30,53 @@ javadoc {
     options.addStringOption('Xdoclint:-missing', '-quiet')
 }
 
-
 hytale {
-    // Add `--allow-op` to server args (allows you to run `/op self` in-game)
-    allowOp.set(true)
-    
-    // Set the patchline to use, currently there are "release" and "pre-release"
-    patchline.set("pre-release")
+    // Versioning
+    patchline = "pre-release"
 
-    // Load mods from the local Hytale installation
-    includeLocalMods.set(true)
-    
-    disableSentry.set(true)
-    
-    // Replace the version in the manifest with the project version
+    // Manifest auto update
     manifest {
-        version.set(project.version.toString())
+        version = project.version.toString()
         author(author_name, "ellie@ellie.au", "https://ellie.au")
         optionalDependencies.put("Buuz135:MultipleHUD", "*");
-        
     }
-}
 
-// Adds the Hytale server as a build dependency, allowing you to reference and
-// compile against their code. This requires you to have Hytale installed using
-// the official launcher for now.
-dependencies {
-    shadow 'org.jsoup:jsoup:1.22.1'
-    implementation 'org.jsoup:jsoup:1.22.1'
-}
-
-repositories {
-    mavenCentral()
+    // Server run configuration
+    includeLocalMods = true
+    disableSentry = true
+    allowOp = true
 }
 
 shadowJar {
-    archiveBaseName.set(project.name)
-    archiveClassifier.set('debug')
+    archiveBaseName = project.name
+    archiveClassifier = 'debug'
 
     configurations = [project.configurations.shadow]
 }
 
+// Task: Hytale server run
+
 tasks.runServer {
-    jvmArgs = jvmArgs + "-XX:+AllowEnhancedClassRedefinition"
+    jvmArgs += "-XX:+AllowEnhancedClassRedefinition"
     environment("HYUI_DEV", "true")
     //args = args + "--log FINEST"
 }
 
+// Task: Generate release jar
+
+tasks.sourcesJar {
+    dependsOn tasks.updateManifest
+}
+
 tasks.register('releaseJar', Jar) {
     group = 'build'
-    description = 'uhhm, somethimg'
-
-    dependsOn tasks.shadowJar
-
-    def shadowJarTask = tasks.shadowJar as Jar
-
+    description = 'Builds the release jar without dev resources'
     archiveClassifier = 'all'
 
+    dependsOn tasks.shadowJar
+    dependsOn tasks.test
+
+    def shadowJarTask = tasks.shadowJar as Jar
     from(zipTree(shadowJarTask.archiveFile)) {
         exclude(
                 'Common/UI/Custom/Pages/*.html',
@@ -84,4 +86,30 @@ tasks.register('releaseJar', Jar) {
     }
 
     destinationDirectory = layout.buildDirectory.dir('libs')
+}
+
+// Task: Test configuration
+
+configurations {
+    testRuntimeOnly {
+        extendsFrom configurations.hytaleServer
+    }
+}
+
+tasks.test {
+    useJUnitPlatform()
+    maxHeapSize = "1G"
+
+    // Run only if releaseJar is being executed
+    onlyIf {
+        gradle.startParameter.taskNames.contains(name)
+                || gradle.taskGraph.hasTask(tasks.named("releaseJar").get())
+    }
+
+    // Use Hytale's custom log manager during tests
+    jvmArgs "-Djava.util.logging.manager=com.hypixel.hytale.logger.backend.HytaleLogManager"
+
+    testLogging {
+        events "passed", "failed", "skipped"
+    }
 }
