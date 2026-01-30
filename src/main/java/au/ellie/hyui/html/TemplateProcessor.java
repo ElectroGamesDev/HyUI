@@ -116,9 +116,7 @@ public class TemplateProcessor {
     @SuppressWarnings("unchecked")
     public TemplateProcessor setVariables(Map<String, ?> vars) {
         for (Map.Entry<String, ?> entry : vars.entrySet()) {
-            var value = entry.getValue();
-
-            setVariable(entry.getKey(), value);
+            setVariable(entry.getKey(), entry.getValue());
         }
         return this;
     }
@@ -821,8 +819,7 @@ public class TemplateProcessor {
         if (item instanceof Map<?, ?> map) {
             for (Map.Entry<?, ?> entry : map.entrySet()) {
                 if (entry.getKey() instanceof String key) {
-                    var value = entry.getValue();
-                    values.put(key, value);
+                    values.put(key, entry.getValue());
                 }
             }
             return values;
