@@ -293,8 +293,10 @@ public class ButtonBuilder extends UIElementBuilder<ButtonBuilder> implements
     protected void onBuild(UICommandBuilder commands, UIEventBuilder events) {
         String selector = getSelector();
         if (selector == null) return;
-
-        applyLayoutMode(commands, selector);
+        
+        // Make sure we apply the layout mode to the wrapping group, not the button itself.
+        applyLayoutMode(commands, "#" + getEffectiveId());
+        
         applyBackground(commands, selector);
 
         if (text != null && isTextButtonElement()) {
