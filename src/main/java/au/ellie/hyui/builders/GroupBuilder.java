@@ -40,7 +40,6 @@ public class GroupBuilder extends UIElementBuilder<GroupBuilder> implements
     private HyUIPatchStyle background;
     private String scrollbarStyleReference;
     private String scrollbarStyleDocument;
-    private Boolean clipChildren;
 
     public GroupBuilder() {
         super(UIElements.GROUP, "Group");
@@ -94,17 +93,6 @@ public class GroupBuilder extends UIElementBuilder<GroupBuilder> implements
         return this;
     }
 
-    /**
-     * Sets whether the group should clip its children.
-     *
-     * @param clipChildren Whether to clip children.
-     * @return This builder instance for method chaining.
-     */
-    public GroupBuilder withClipChildren(boolean clipChildren) {
-        this.clipChildren = clipChildren;
-        return this;
-    }
-
     @Override
     public String getScrollbarStyleReference() {
         return this.scrollbarStyleReference;
@@ -128,10 +116,5 @@ public class GroupBuilder extends UIElementBuilder<GroupBuilder> implements
         applyLayoutMode(commands, selector);
         applyBackground(commands, selector);
         applyScrollbarStyle(commands, selector);
-
-        if (clipChildren != null) {
-            commands.set(selector + ".ClipChildren", clipChildren);
-        }
-
     }
 }
