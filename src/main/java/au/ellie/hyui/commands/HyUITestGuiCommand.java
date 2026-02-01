@@ -21,6 +21,7 @@ package au.ellie.hyui.commands;
 import au.ellie.hyui.HyUIPlugin;
 import au.ellie.hyui.HyUIPluginLogger;
 import au.ellie.hyui.builders.*;
+import au.ellie.hyui.events.PageRefreshResult;
 import au.ellie.hyui.events.SlotMouseDragCompletedEventData;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -70,7 +71,7 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                     return CompletableFuture.runAsync(() -> {
                         PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
                         if (playerRef != null) {
-                            openReplicate(playerRef, store);
+                            openHtmlTestGui(playerRef, store);
                         }
                     }, world);
                 } else {
@@ -241,6 +242,15 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                     a.ifPresent(aDouble -> HyUIPlugin.getLog().logInfo("Price input is: " + aDouble));
                 })*/
                 .withLifetime(CustomPageLifetime.CanDismiss)
+                .withRefreshRate(1000)
+                .onRefresh((page) -> {
+                    playerRef.sendMessage(Message.raw("HEY"));
+                    int count = clicks.get();
+                    if (count == 0) {
+                        return PageRefreshResult.NONE;
+                    }
+                    return (count % 2 == 0) ? PageRefreshResult.UPDATE_CLEAR : PageRefreshResult.UPDATE;
+                })
                 .addEventListener("btn1", CustomUIEventBindingType.Activating, (data, ctx) -> {
                     playerRef.sendMessage(Message.raw("Button clicked via PageBuilder ID lookup!: " +
                     ctx.getValue("myInput", String.class).orElse("N/A")));

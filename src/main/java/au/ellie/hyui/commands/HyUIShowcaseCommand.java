@@ -90,6 +90,7 @@ public class HyUIShowcaseCommand extends AbstractAsyncCommand {
 
         PageBuilder builder = PageBuilder.pageForPlayer(playerRef)
                 .fromTemplate(html, template)
+                .enableAsyncImageLoading(true)
                 .withLifetime(CustomPageLifetime.CanDismiss);
 
         // Interactive demo button

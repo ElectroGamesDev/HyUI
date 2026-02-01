@@ -41,6 +41,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -51,6 +54,8 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
     protected String templateHtml;
     protected TemplateProcessor templateProcessor;
     protected boolean runtimeTemplateUpdatesEnabled;
+    protected boolean asyncImageLoadingEnabled;
+    private static final ExecutorService DYNAMIC_IMAGE_EXECUTOR = Executors.newCachedThreadPool();
 
     @SuppressWarnings("unchecked")
     protected T self() {
@@ -164,6 +169,11 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
 
     public T enableRuntimeTemplateUpdates(boolean enabled) {
         this.runtimeTemplateUpdatesEnabled = enabled;
+        return self();
+    }
+
+    public T enableAsyncImageLoading(boolean enabled) {
+        this.asyncImageLoadingEnabled = enabled;
         return self();
     }
 
@@ -342,6 +352,30 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
                     continue;
                 }
                 sendDynamicImage(pRef, dImg);
+            }
+        }
+    }
+
+    protected void sendDynamicImageIfNeededAsync(PlayerRef pRef, Consumer<DynamicImageBuilder> onComplete) {
+        if (pRef == null || !pRef.isValid()) {
+            return;
+        }
+        UUID playerUuid = pRef.getUuid();
+        for (UIElementBuilder<?> element : elementRegistry.values()) {
+            if (element instanceof DynamicImageBuilder dImg) {
+                if (dImg.isImagePathAssigned(playerUuid)) {
+                    continue;
+                }
+                String url = dImg.getImageUrl();
+                if (url == null || url.isBlank()) {
+                    continue;
+                }
+                CompletableFuture.runAsync(() -> sendDynamicImage(pRef, dImg), DYNAMIC_IMAGE_EXECUTOR)
+                        .thenRun(() -> {
+                            if (onComplete != null) {
+                                onComplete.accept(dImg);
+                            }
+                        });
             }
         }
     }
