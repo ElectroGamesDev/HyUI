@@ -22,10 +22,16 @@ import au.ellie.hyui.HyUIPlugin;
 import au.ellie.hyui.events.UIContext;
 import au.ellie.hyui.builders.UIElementBuilder;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -152,6 +158,22 @@ public class TemplateProcessor {
     }
 
     /**
+     * Registers a reusable component template loaded from resources.
+     *
+     * @param name         Component name (e.g., "button", "card")
+     * @param resourcePath Resource path to the component HTML - located in Common/UI/Custom/.
+     * @return This processor for chaining
+     */
+    public TemplateProcessor registerComponentFromFile(String name, String resourcePath) {
+        if (resourcePath == null || resourcePath.isBlank()) {
+            throw new IllegalArgumentException("Resource path cannot be null or blank.");
+        }
+        String trimmed = resourcePath.startsWith("/") ? resourcePath.substring(1) : resourcePath;
+        String template = loadHtmlFromResources( "/Common/UI/Custom/" + trimmed);
+        return registerComponent(name, template);
+    }
+
+    /**
      * Registers a custom filter function.
      *
      * @param name   Filter name
@@ -199,6 +221,38 @@ public class TemplateProcessor {
         } finally {
             this.valueResolver = previousResolver;
             this.preferDynamicValues = previousPreferDynamic;
+        }
+    }
+
+    private String loadHtmlFromResources(String resourceFileName) {
+        if (resourceFileName == null || resourceFileName.isBlank()) {
+            throw new IllegalArgumentException("Resource path cannot be null or blank.");
+        }
+        String normalized = resourceFileName.startsWith("/") ? resourceFileName.substring(1) : resourceFileName;
+        List<Path> candidatePaths = List.of(
+                Paths.get("src/main/resources").resolve(normalized),
+                Paths.get("..", "src", "main", "resources").resolve(normalized),
+                Paths.get("build/resources/main").resolve(normalized),
+                Paths.get("..", "build", "resources", "main").resolve(normalized),
+                Paths.get(normalized)
+        );
+        for (Path path : candidatePaths) {
+            if (Files.isRegularFile(path)) {
+                try {
+                    return Files.readString(path, StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to load HTML from file: " + path, e);
+                }
+            }
+        }
+        String resourceLookup = resourceFileName.startsWith("/") ? resourceFileName : "/" + resourceFileName;
+        try (InputStream inputStream = TemplateProcessor.class.getResourceAsStream(resourceLookup)) {
+            if (inputStream == null) {
+                throw new IllegalArgumentException("Resource not found: " + resourceFileName);
+            }
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load HTML from resource: " + resourceFileName, e);
         }
     }
 
