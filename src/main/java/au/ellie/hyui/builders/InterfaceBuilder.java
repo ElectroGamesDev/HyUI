@@ -402,10 +402,11 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
                         hyvatar.getRenderType(),
                         hyvatar.getSize(),
                         hyvatar.getRotate(),
-                        hyvatar.getCape()
+                        hyvatar.getCape(),
+                        playerUuid
                 );
             } else {
-                imageBytes = PngDownloadUtils.downloadPng(url);
+                imageBytes = PngDownloadUtils.downloadPng(url, playerUuid);
             }
 
             DynamicImageAsset asset = new DynamicImageAsset(imageBytes, playerUuid);

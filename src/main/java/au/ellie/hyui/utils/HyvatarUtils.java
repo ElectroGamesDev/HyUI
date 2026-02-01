@@ -91,6 +91,15 @@ public final class HyvatarUtils {
         return PngDownloadUtils.downloadPng(url);
     }
 
+    public static byte[] downloadRenderPng(String username, RenderType renderType, Integer size, Integer rotate, String capeOverride, java.util.UUID playerUuid)
+            throws IOException, InterruptedException {
+        String url = buildRenderUrl(username, renderType, size, rotate, capeOverride);
+        if (url == null) {
+            throw new IllegalArgumentException("Username is required to build a Hyvatar render URL.");
+        }
+        return PngDownloadUtils.downloadPng(url, playerUuid);
+    }
+
     private static Integer normalizeSize(Integer size) {
         if (size == null) {
             return null;
