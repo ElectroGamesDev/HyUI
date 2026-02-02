@@ -323,24 +323,28 @@ public interface TagHandler {
                     ParseUtils.parseInt(value)
                             .ifPresent(builder::withFlexWeight);
                     break;
+                case "margin-left":
                 case "anchor-left":
                     ParseUtils.parseInt(value).ifPresent(v -> {
                         parsed.anchor.setLeft(v);
                         parsed.hasAnchor = true;
                     });
                     break;
+                case "margin-right":
                 case "anchor-right":
                     ParseUtils.parseInt(value).ifPresent(v -> {
                         parsed.anchor.setRight(v);
                         parsed.hasAnchor = true;
                     });
                     break;
+                case "margin-top":
                 case "anchor-top":
                     ParseUtils.parseInt(value).ifPresent(v -> {
                         parsed.anchor.setTop(v);
                         parsed.hasAnchor = true;
                     });
                     break;
+                case "margin-bottom":
                 case "anchor-bottom":
                     ParseUtils.parseInt(value).ifPresent(v -> {
                         parsed.anchor.setBottom(v);
