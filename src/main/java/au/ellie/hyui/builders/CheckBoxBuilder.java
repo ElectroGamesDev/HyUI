@@ -135,6 +135,16 @@ public class CheckBoxBuilder extends UIElementBuilder<CheckBoxBuilder> {
     }
 
     @Override
+    protected boolean isStyleWhitelist() {
+        return true;
+    }
+
+    @Override
+    protected java.util.Set<String> getSupportedStyleProperties() {
+        return java.util.Set.of();
+    }
+
+    @Override
     protected void onBuild(UICommandBuilder commands, UIEventBuilder events) {
         String selector = getSelector();
         if (selector == null) return;
@@ -145,12 +155,7 @@ public class CheckBoxBuilder extends UIElementBuilder<CheckBoxBuilder> {
             commands.set(selector + " #CheckBox.Value", value);
         }
 
-        /*if (text != null) {
-            HyUIPlugin.getInstance().logInfo("Setting Text: " + text + " for " + selector);
-            commands.set(selector + " Label.Text", text);
-        }*/
-
-        if (hyUIStyle == null && style != null) {
+        if ( hyUIStyle == null && typedStyle == null  && style != null) {
             HyUIPlugin.getLog().logFinest("Setting Style: " + style + " for " + selector);
             commands.set(selector + ".Style", style);
         }

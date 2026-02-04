@@ -196,7 +196,7 @@ public class TimerLabelBuilder extends UIElementBuilder<TimerLabelBuilder> imple
         HyUIPlugin.getLog().logFinest("Setting Timer Text: " + displayText + " for " + selector);
         commands.set(selector + ".Text", displayText);
 
-        if (hyUIStyle == null && style != null) {
+        if ( hyUIStyle == null && typedStyle == null  && style != null) {
             HyUIPlugin.getLog().logFinest("Setting Raw Style: " + style + " for " + selector);
             commands.set(selector + ".Style", style);
         }

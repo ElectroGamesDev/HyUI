@@ -22,6 +22,7 @@ import au.ellie.hyui.HyUIPlugin;
 import au.ellie.hyui.theme.Theme;
 import au.ellie.hyui.events.UIContext;
 import au.ellie.hyui.events.UIEventListener;
+import au.ellie.hyui.types.HyUIBsonSerializable;
 import au.ellie.hyui.utils.BsonDocumentHelper;
 import au.ellie.hyui.utils.PropertyBatcher;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
@@ -52,6 +53,7 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
     protected String userId;
     protected String style;
     protected HyUIStyle hyUIStyle;
+    protected HyUIBsonSerializable typedStyle;
     protected final List<UIEventListener<?>> listeners = new ArrayList<>();
     protected final List<UIElementBuilder<?>> children = new ArrayList<>();
     protected Object initialValue;
@@ -67,6 +69,7 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
     protected final List<BiConsumer<UICommandBuilder, String>> editAfterCallbacks = new ArrayList<>();
     protected final List<BiConsumer<UICommandBuilder, String>> editBeforeCallbacks = new ArrayList<>();
     protected final Map<String, HyUIStyle> secondaryStyles = new HashMap<>();
+    protected final Map<String, HyUIBsonSerializable> secondaryTypedStyles = new HashMap<>();
     private static final Set<String> TEMPLATE_FIELD_EXCLUSIONS = Set.of(
             "listeners",
             "children",
@@ -78,7 +81,9 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
             "editBeforeCallbacks",
             "lastBuiltTabsVersion",
             "tabsVersion",
-            "selectedTabId"
+            "selectedTabId",
+            "typedStyle",
+            "secondaryTypedStyles"
     );
 
     private static int idCounter = 0;
@@ -204,6 +209,14 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
         return (T) this;
     }
 
+    @SuppressWarnings("unchecked")
+    public T withSecondaryStyle(String property, HyUIBsonSerializable style) {
+        if (style != null) {
+            this.secondaryTypedStyles.put(property, style);
+        }
+        return (T) this;
+    }
+
     /**
      * @param id the id to set for the element, without leading #.
      * @return the builder instance for method chaining
@@ -253,6 +266,20 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
     public T withStyle(HyUIStyle style) {
         if (supportsStyling()) {
             this.hyUIStyle = style;
+        }
+        return (T) this;
+    }
+
+    /**
+     * Applies the specified typed style to the current UI element if styling is supported.
+     *
+     * @param style the {@code HyUIBsonSerializable} instance to be applied to the UI element
+     * @return the builder instance of type {@code T} for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public T withStyle(HyUIBsonSerializable style) {
+        if (supportsStyling()) {
+            this.typedStyle = style;
         }
         return (T) this;
     }
@@ -551,7 +578,11 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
                 commands.set(flexSelector + ".FlexWeight", flexWeight);
             }
 
-            if (hyUIStyle != null) {
+            if (typedStyle != null) {
+                BsonDocumentHelper doc = PropertyBatcher.beginSet();
+                typedStyle.applyTo(doc);
+                PropertyBatcher.endSet(selector + ".Style", doc, commands);
+            } else if (hyUIStyle != null) {
                 BsonDocumentHelper doc = PropertyBatcher.beginSet();
                 applyStyle(commands, selector + ".Style", hyUIStyle, doc);
                 PropertyBatcher.endSet(selector + ".Style", doc, commands);
@@ -563,6 +594,12 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
                     applyRawStyleProperties(commands, selector + ".Style." + state, nestedStyle);
                 });
             }
+
+            secondaryTypedStyles.forEach((property, style) -> {
+                BsonDocumentHelper doc = PropertyBatcher.beginSet();
+                style.applyTo(doc);
+                PropertyBatcher.endSet(selector + "." + property, doc, commands);
+            });
 
             secondaryStyles.forEach((property, style) -> {
                 BsonDocumentHelper doc = PropertyBatcher.beginSet();

@@ -171,7 +171,7 @@ public class LabelBuilder extends UIElementBuilder<LabelBuilder> implements Back
             commands.set(selector + ".Text", text);
         }
 
-        if (hyUIStyle == null && style != null) {
+        if ( hyUIStyle == null && typedStyle == null  && style != null) {
             HyUIPlugin.getLog().logFinest("Setting Raw Style: " + style + " for " + selector);
             commands.set(selector + ".Style", style);
         }

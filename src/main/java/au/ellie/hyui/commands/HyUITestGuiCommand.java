@@ -23,6 +23,8 @@ import au.ellie.hyui.HyUIPluginLogger;
 import au.ellie.hyui.builders.*;
 import au.ellie.hyui.events.PageRefreshResult;
 import au.ellie.hyui.events.SlotMouseDragCompletedEventData;
+import au.ellie.hyui.types.ButtonSounds;
+import au.ellie.hyui.types.SliderStyle;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.GameMode;
@@ -71,7 +73,7 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                     return CompletableFuture.runAsync(() -> {
                         PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
                         if (playerRef != null) {
-                            openHtmlTestGui(playerRef, store);
+                            openTestGui(playerRef, store);
                         }
                     }, world);
                 } else {
@@ -390,6 +392,17 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                                 .withMin(-50)
                                 .withStep(10)
                                 .withValue(51)
+                                .withAnchor(new HyUIAnchor().setHeight(15).setWidth(100))
+                                .withStyle(new SliderStyle()
+                                        .withBackground(
+                                                new HyUIPatchStyle()
+                                                        .setTexturePath("Common/SliderBackground.png")
+                                                        .setBorder(2)
+                                        )
+                                        .withHandle("Common/SliderHandle.png")
+                                        .withHandleWidth(16)
+                                        .withHandleHeight(16)
+                                )
                                 .addEventListener(CustomUIEventBindingType.ValueChanged, (value, ctx) -> {
                                     HyUIPlugin.getLog().logFinest("Slider value changed to: " + value);
                                     String text = ctx.getValue("MyTextField", String.class).orElse("N/A");
@@ -466,8 +479,8 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                                 .withOuterAnchor(new HyUIAnchor().setWidth(200).setHeight(12))
                         )
                         .addChild(ButtonBuilder.textButton()
-                                .withText("Button with Icon")
-                                .withItemIcon(ItemIconBuilder.itemIcon().withItemId("Items/IronSword.png")))
+                                .withText("Button with Icon"))
+                                //.withItemIcon(ItemIconBuilder.itemIcon().withItemId("Items/IronSword.png")))
                         .addChild(ContainerBuilder.container()
                                 .withId("MyContainer")
                                 .withTitleText("Custom Title")

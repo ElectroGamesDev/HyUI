@@ -25,6 +25,10 @@ import au.ellie.hyui.events.UIEventActions;
 import au.ellie.hyui.elements.UIElements;
 import au.ellie.hyui.events.UIContext;
 import au.ellie.hyui.theme.Theme;
+import au.ellie.hyui.types.ButtonStyle;
+import au.ellie.hyui.types.ButtonStyleState;
+import au.ellie.hyui.types.TextButtonStyle;
+import au.ellie.hyui.types.TextButtonStyleState;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
@@ -272,6 +276,19 @@ public class ButtonBuilder extends UIElementBuilder<ButtonBuilder> implements
     }
 
     @Override
+    public ButtonBuilder withStyle(HyUIStyle style) {
+        if (style == null || isBackButton()) {
+            return this;
+        }
+        if (isTextButtonElement()) {
+            TextButtonStyleState state = (TextButtonStyleState) new TextButtonStyleState().withLabelStyle(style);
+            return (ButtonBuilder) super.withStyle(new TextButtonStyle().withDefault(state));
+        }
+        ButtonStyleState state = new ButtonStyleState().withLabelStyle(style);
+        return (ButtonBuilder) super.withStyle(new ButtonStyle().withDefault(state));
+    }
+
+    @Override
     protected boolean isStyleWhitelist() {
         return true;
     }
@@ -332,7 +349,7 @@ public class ButtonBuilder extends UIElementBuilder<ButtonBuilder> implements
             commands.set(selector + ".Overscroll", overscroll);
         }
 
-        if (hyUIStyle == null && style != null && !isBackButton()) {
+        if ( hyUIStyle == null && typedStyle == null  && style != null && !isBackButton()) {
             HyUIPlugin.getLog().logFinest("Setting Style: " + style + " for " + selector);
             commands.set(selector + ".Style", style);
         }

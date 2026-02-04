@@ -36,6 +36,7 @@ import java.util.function.Consumer;
  */
 public class ColorPickerBuilder extends UIElementBuilder<ColorPickerBuilder> {
     private String value;
+    private String format;
 
     /**
      * Constructs a new instance of {@code ColorPickerBuilder}, initializing it with
@@ -64,6 +65,17 @@ public class ColorPickerBuilder extends UIElementBuilder<ColorPickerBuilder> {
     public ColorPickerBuilder withValue(String hexColor) {
         this.value = hexColor;
         this.initialValue = hexColor;
+        return this;
+    }
+
+    /**
+     * Sets the color picker format.
+     *
+     * @param format the format (e.g. Rgb)
+     * @return the {@code ColorPickerBuilder} instance for method chaining.
+     */
+    public ColorPickerBuilder withFormat(String format) {
+        this.format = format;
         return this;
     }
 
@@ -113,8 +125,20 @@ public class ColorPickerBuilder extends UIElementBuilder<ColorPickerBuilder> {
     }
 
     @Override
-    protected Set<String> getUnsupportedStyleProperties() {
-        return Set.of("TextColor");
+    protected boolean isStyleWhitelist() {
+        return true;
+    }
+
+    @Override
+    protected Set<String> getSupportedStyleProperties() {
+        return Set.of(
+                "OpacitySelectorBackground",
+                "ButtonBackground",
+                "ButtonFill",
+                "TextFieldDecoration",
+                "TextFieldPadding",
+                "TextFieldHeight"
+        );
     }
 
     @Override
@@ -126,8 +150,12 @@ public class ColorPickerBuilder extends UIElementBuilder<ColorPickerBuilder> {
             HyUIPlugin.getLog().logFinest("Setting Value: " + value + " for " + selector);
             commands.set(selector + ".Value", value);
         }
+        if (format != null) {
+            HyUIPlugin.getLog().logFinest("Setting Format: " + format + " for " + selector);
+            commands.set(selector + ".Format", format);
+        }
 
-        if (hyUIStyle == null && style != null) {
+        if ( hyUIStyle == null && typedStyle == null  && style != null) {
             HyUIPlugin.getLog().logFinest("Setting Style: " + style + " for " + selector);
             commands.set(selector + ".Style", style);
         }
