@@ -32,6 +32,7 @@ public class HotkeyLabelBuilder extends UIElementBuilder<HotkeyLabelBuilder> {
 
     public HotkeyLabelBuilder() {
         super(UIElements.HOTKEY_LABEL, "#HyUIHotkeyLabel");
+        withUiFile("Pages/Elements/HotkeyLabel.ui");
         withWrappingGroup(true);
     }
 

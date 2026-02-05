@@ -83,4 +83,12 @@ public class InputFieldStyle implements HyUIBsonSerializable {
         if (renderItalics != null) doc.set("RenderItalics", renderItalics);
         if (renderUppercase != null) doc.set("RenderUppercase", renderUppercase);
     }
+
+    public static InputFieldStyle defaultStyle() {
+        return DefaultStyles.defaultInputFieldStyle();
+    }
+
+    public static InputFieldStyle defaultPlaceholderStyle() {
+        return DefaultStyles.defaultInputFieldPlaceholderStyle();
+    }
 }

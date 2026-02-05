@@ -47,6 +47,7 @@ public class MenuItemBuilder extends UIElementBuilder<MenuItemBuilder> {
 
     public MenuItemBuilder() {
         super(UIElements.MENU_ITEM, "#HyUIMenuItem");
+        withUiFile("Pages/Elements/MenuItem.ui");
         withWrappingGroup(true);
     }
 

@@ -29,6 +29,7 @@ import au.ellie.hyui.types.ButtonStyle;
 import au.ellie.hyui.types.ButtonStyleState;
 import au.ellie.hyui.types.TextButtonStyle;
 import au.ellie.hyui.types.TextButtonStyleState;
+import au.ellie.hyui.utils.PropertyBatcher;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
@@ -280,6 +281,10 @@ public class ButtonBuilder extends UIElementBuilder<ButtonBuilder> implements
         if (style == null || isBackButton()) {
             return this;
         }
+        if (style.getStyleReference() != null) {
+            this.hyUIStyle = style;
+            return this;
+        }
         if (isTextButtonElement()) {
             TextButtonStyleState state = (TextButtonStyleState) new TextButtonStyleState().withLabelStyle(style);
             return (ButtonBuilder) super.withStyle(new TextButtonStyle().withDefault(state));
@@ -352,7 +357,9 @@ public class ButtonBuilder extends UIElementBuilder<ButtonBuilder> implements
         if ( hyUIStyle == null && typedStyle == null  && style != null && !isBackButton()) {
             HyUIPlugin.getLog().logFinest("Setting Style: " + style + " for " + selector);
             commands.set(selector + ".Style", style);
-        }
+        } /*else if (hyUIStyle == null && typedStyle != null && !isBackButton()) {
+            PropertyBatcher.endSet(selector + ".Style", typedStyle.toBsonDocument(), commands);
+        }*/
 
         listeners.forEach(listener -> {
             if (listener.type() == CustomUIEventBindingType.Activating) {

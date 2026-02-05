@@ -49,4 +49,8 @@ public class DropdownBoxSounds implements HyUIBsonSerializable {
         if (mouseHover != null) doc.set("MouseHover", mouseHover.toBsonDocument());
         if (close != null) doc.set("Close", close.toBsonDocument());
     }
+
+    public static DropdownBoxSounds defaultStyle() {
+        return DefaultStyles.dropdownBoxSounds();
+    }
 }

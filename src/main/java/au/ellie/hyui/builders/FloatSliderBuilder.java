@@ -22,6 +22,7 @@ import au.ellie.hyui.HyUIPlugin;
 import au.ellie.hyui.events.UIContext;
 import au.ellie.hyui.events.UIEventActions;
 import au.ellie.hyui.elements.UIElements;
+import au.ellie.hyui.utils.PropertyBatcher;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
@@ -42,6 +43,7 @@ public class FloatSliderBuilder extends UIElementBuilder<FloatSliderBuilder> {
 
     public FloatSliderBuilder() {
         super(UIElements.FLOAT_SLIDER, "#HyUIFloatSlider");
+        withUiFile("Pages/Elements/FloatSlider.ui");
         withWrappingGroup(true);
     }
 
@@ -127,6 +129,8 @@ public class FloatSliderBuilder extends UIElementBuilder<FloatSliderBuilder> {
         if ( hyUIStyle == null && typedStyle == null  && style != null) {
             HyUIPlugin.getLog().logFinest("Setting Style for FloatSlider " + selector);
             commands.set(selector + ".Style", style);
+        } else if (hyUIStyle == null && typedStyle != null) {
+            PropertyBatcher.endSet(selector + ".Style", typedStyle.toBsonDocument(), commands);
         } else if ( hyUIStyle == null && typedStyle == null ) {
             HyUIPlugin.getLog().logFinest("Setting Style for FloatSlider to DefaultSliderStyle " + selector);
             commands.set(selector + ".Style", Value.ref("Common.ui", "DefaultSliderStyle"));

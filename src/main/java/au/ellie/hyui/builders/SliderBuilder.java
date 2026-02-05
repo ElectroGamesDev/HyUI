@@ -23,7 +23,6 @@ import au.ellie.hyui.events.UIContext;
 import au.ellie.hyui.events.UIEventActions;
 import au.ellie.hyui.elements.UIElements;
 import au.ellie.hyui.theme.Theme;
-import au.ellie.hyui.utils.BsonDocumentHelper;
 import au.ellie.hyui.utils.PropertyBatcher;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.ui.Value;
@@ -167,7 +166,6 @@ public class SliderBuilder extends UIElementBuilder<SliderBuilder> {
             HyUIPlugin.getLog().logFinest("Setting Style for Slider " + selector);
             commands.set(selector + ".Style", style);
         } else if (hyUIStyle == null && typedStyle != null) {
-            // Completely overwrite the style property.
             PropertyBatcher.endSet(selector + ".Style", typedStyle.toBsonDocument(), commands);
         } else {
             HyUIPlugin.getLog().logFinest("Setting Style for Slider to DefaultSliderStyle " + selector);

@@ -19,6 +19,7 @@
 package au.ellie.hyui.builders;
 
 import au.ellie.hyui.HyUIPlugin;
+import au.ellie.hyui.elements.LayoutModeSupported;
 import au.ellie.hyui.events.UIContext;
 import au.ellie.hyui.events.UIEventActions;
 import au.ellie.hyui.elements.UIElements;
@@ -34,11 +35,14 @@ import java.util.function.Consumer;
 /**
  * Builder for ItemSlotButton UI elements.
  */
-public class ItemSlotButtonBuilder extends UIElementBuilder<ItemSlotButtonBuilder> {
+public class ItemSlotButtonBuilder extends UIElementBuilder<ItemSlotButtonBuilder> 
+        implements LayoutModeSupported<ItemSlotButtonBuilder> {
     private String itemId;
+    private String layoutMode;
 
     public ItemSlotButtonBuilder() {
         super(UIElements.ITEM_SLOT_BUTTON, "#HyUIItemSlotButton");
+        withUiFile("Pages/Elements/ItemSlotButton.ui");
         withWrappingGroup(true);
     }
 
@@ -46,9 +50,14 @@ public class ItemSlotButtonBuilder extends UIElementBuilder<ItemSlotButtonBuilde
         return new ItemSlotButtonBuilder();
     }
 
-    public ItemSlotButtonBuilder withItemId(String itemId) {
-        this.itemId = itemId;
+    public ItemSlotButtonBuilder withLayoutMode(String layoutMode) {
+        this.layoutMode = layoutMode;
         return this;
+    }
+
+    @Override
+    public String getLayoutMode() {
+        return this.layoutMode;
     }
 
     public ItemSlotButtonBuilder addEventListener(CustomUIEventBindingType type, Consumer<Void> callback) {
@@ -79,9 +88,11 @@ public class ItemSlotButtonBuilder extends UIElementBuilder<ItemSlotButtonBuilde
         String selector = getSelector();
         if (selector == null) return;
 
-        if (itemId != null) {
-            HyUIPlugin.getLog().logFinest("Setting ItemId on " + selector + " to " + itemId);
-            commands.set(selector + ".ItemId", itemId);
+        applyLayoutMode(commands, selector);
+        
+        if (layoutMode != null) {
+            HyUIPlugin.getLog().logFinest("Setting LayoutMode: " + layoutMode + " for " + selector);
+            commands.set(selector + ".LayoutMode", layoutMode);
         }
 
         listeners.forEach(listener -> {

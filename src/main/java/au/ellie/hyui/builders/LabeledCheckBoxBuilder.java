@@ -28,6 +28,7 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 public class LabeledCheckBoxBuilder extends UIElementBuilder<LabeledCheckBoxBuilder> {
     public LabeledCheckBoxBuilder() {
         super(UIElements.LABELED_CHECK_BOX, "#HyUILabeledCheckBox");
+        withUiFile("Pages/Elements/LabeledCheckBox.ui");
         withWrappingGroup(true);
     }
 

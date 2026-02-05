@@ -18,6 +18,7 @@
 
 package au.ellie.hyui.builders;
 
+import au.ellie.hyui.elements.BackgroundSupported;
 import au.ellie.hyui.elements.UIElements;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
@@ -25,14 +26,28 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 /**
  * Builder for Panel UI elements.
  */
-public class PanelBuilder extends UIElementBuilder<PanelBuilder> {
+public class PanelBuilder extends UIElementBuilder<PanelBuilder> implements BackgroundSupported<PanelBuilder> {
+    private HyUIPatchStyle background;
+
     public PanelBuilder() {
         super(UIElements.PANEL, "#HyUIPanel");
+        withUiFile("Pages/Elements/Panel.ui");
         withWrappingGroup(true);
     }
 
     public static PanelBuilder panel() {
         return new PanelBuilder();
+    }
+
+    @Override
+    public PanelBuilder withBackground(HyUIPatchStyle background) {
+        this.background = background;
+        return this;
+    }
+
+    @Override
+    public HyUIPatchStyle getBackground() {
+        return this.background;
     }
 
     @Override
@@ -42,5 +57,9 @@ public class PanelBuilder extends UIElementBuilder<PanelBuilder> {
 
     @Override
     protected void onBuild(UICommandBuilder commands, UIEventBuilder events) {
+        String selector = getSelector();
+        if (selector == null) return;
+
+        applyBackground(commands, selector);
     }
 }

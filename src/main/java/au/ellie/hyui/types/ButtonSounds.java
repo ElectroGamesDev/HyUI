@@ -21,4 +21,12 @@ package au.ellie.hyui.types;
 /**
  * ButtonSounds type definition.
  */
-public class ButtonSounds extends SoundsStyle {}
+public class ButtonSounds extends SoundsStyle {
+    public static ButtonSounds defaultStyle() {
+        return DefaultStyles.buttonSounds();
+    }
+
+    public static ButtonSounds destructiveStyle() {
+        return DefaultStyles.buttonDestructiveSounds();
+    }
+}

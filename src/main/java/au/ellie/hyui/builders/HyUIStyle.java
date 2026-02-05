@@ -26,9 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HyUIStyle {
-    public enum Alignment {
-        Left, Center, Right, End, Start
-    }
 
     private Float fontSize;
     private Boolean renderBold;

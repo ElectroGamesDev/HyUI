@@ -258,9 +258,7 @@ public class NumberFieldBuilder extends UIElementBuilder<NumberFieldBuilder> {
             commands.set(selector + ".Value", value);
         }
         if (formatObject != null) {
-            BsonDocumentHelper formatDoc = PropertyBatcher.beginSet();
-            formatObject.applyTo(formatDoc);
-            PropertyBatcher.endSet(selector + ".Format", formatDoc, commands);
+            PropertyBatcher.endSet(selector + ".Format", formatObject.toBsonDocument(), commands);
         } else if (format != null) {
             HyUIPlugin.getLog().logFinest("Setting Format: " + format + " for " + selector);
             commands.set(selector + ".Format", format);
@@ -269,6 +267,8 @@ public class NumberFieldBuilder extends UIElementBuilder<NumberFieldBuilder> {
         if ( hyUIStyle == null && typedStyle == null  && style != null) {
             HyUIPlugin.getLog().logFinest("Setting Style: " + style + " for " + selector);
             commands.set(selector + ".Style", style);
+        } else if (hyUIStyle == null && typedStyle != null) {
+            PropertyBatcher.endSet(selector + ".Style", typedStyle.toBsonDocument(), commands);
         } else if ( hyUIStyle == null && typedStyle == null ) {
             commands.set(selector + ".Style", Value.ref("Common.ui", "DefaultInputFieldStyle"));
         }

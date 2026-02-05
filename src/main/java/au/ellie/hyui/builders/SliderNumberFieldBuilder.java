@@ -38,13 +38,14 @@ import java.util.function.Consumer;
  */
 public class SliderNumberFieldBuilder extends UIElementBuilder<SliderNumberFieldBuilder> {
     private HyUIAnchor numberFieldContainerAnchor;
-    private Double min;
-    private Double max;
-    private Double step;
-    private Double value;
+    private Integer min;
+    private Integer max;
+    private Integer step;
+    private Integer value;
 
     public SliderNumberFieldBuilder() {
         super(UIElements.SLIDER_NUMBER_FIELD, "#HyUISliderNumberField");
+        withUiFile("Pages/Elements/SliderNumberField.ui");
         withWrappingGroup(true);
     }
 
@@ -65,22 +66,22 @@ public class SliderNumberFieldBuilder extends UIElementBuilder<SliderNumberField
         return this;
     }
 
-    public SliderNumberFieldBuilder withMin(double min) {
+    public SliderNumberFieldBuilder withMin(int min) {
         this.min = min;
         return this;
     }
 
-    public SliderNumberFieldBuilder withMax(double max) {
+    public SliderNumberFieldBuilder withMax(int max) {
         this.max = max;
         return this;
     }
 
-    public SliderNumberFieldBuilder withStep(double step) {
+    public SliderNumberFieldBuilder withStep(int step) {
         this.step = step;
         return this;
     }
 
-    public SliderNumberFieldBuilder withValue(double value) {
+    public SliderNumberFieldBuilder withValue(int value) {
         this.value = value;
         this.initialValue = value;
         return this;
@@ -97,7 +98,7 @@ public class SliderNumberFieldBuilder extends UIElementBuilder<SliderNumberField
     @Override
     protected void applyRuntimeValue(Object value) {
         if (value instanceof Number number) {
-            Double next = number.doubleValue();
+            Integer next = number.intValue();
             this.value = next;
             this.initialValue = next;
         }

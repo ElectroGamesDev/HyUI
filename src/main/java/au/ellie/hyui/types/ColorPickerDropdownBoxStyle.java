@@ -101,4 +101,8 @@ public class ColorPickerDropdownBoxStyle implements HyUIBsonSerializable {
         if (arrowAnchor != null) doc.set("ArrowAnchor", arrowAnchor.toBsonDocument());
         if (sounds != null) doc.set("Sounds", sounds.toBsonDocument());
     }
+
+    public static ColorPickerDropdownBoxStyle defaultStyle() {
+        return DefaultStyles.defaultColorPickerDropdownBoxStyle();
+    }
 }

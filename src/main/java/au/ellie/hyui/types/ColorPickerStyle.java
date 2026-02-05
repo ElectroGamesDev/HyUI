@@ -71,4 +71,8 @@ public class ColorPickerStyle implements HyUIBsonSerializable {
         if (textFieldPadding != null) doc.set("TextFieldPadding", textFieldPadding.toBsonDocument());
         if (textFieldHeight != null) doc.set("TextFieldHeight", textFieldHeight);
     }
+
+    public static ColorPickerStyle defaultStyle() {
+        return DefaultStyles.defaultColorPickerStyle();
+    }
 }

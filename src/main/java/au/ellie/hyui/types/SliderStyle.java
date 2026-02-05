@@ -64,4 +64,21 @@ public class SliderStyle implements HyUIBsonSerializable {
         if (handleHeight != null) doc.set("HandleHeight", handleHeight);
         if (sounds != null) doc.set("Sounds", sounds.toBsonDocument());
     }
+    
+    public static SliderStyle defaultStyle() {
+        return new SliderStyle()
+                .withBackground(new HyUIPatchStyle()
+                        .setTexturePath("Common/SliderBackground.png")
+                        .setBorder(2))
+                .withHandle("Common/SliderHandle.png")
+                .withHandleHeight(16)
+                .withHandleWidth(16)
+                .withSounds((ButtonSounds) new ButtonSounds()
+                        .withActivate(new SoundStyle()
+                                .withSoundPath("Sounds/UntickActivate.ogg")
+                                .withVolume(9f))
+                        .withMouseHover(new SoundStyle()
+                                .withSoundPath("Sounds/ButtonsLightHover.ogg")
+                                .withVolume(6f)));
+    }
 }

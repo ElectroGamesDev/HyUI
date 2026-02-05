@@ -65,4 +65,8 @@ public class TextTooltipStyle implements HyUIBsonSerializable {
         if (padding != null) doc.set("Padding", padding);
         if (alignment != null) doc.set("Alignment", alignment);
     }
+
+    public static TextTooltipStyle buttonTextTooltipStyle() {
+        return DefaultStyles.buttonTextTooltipStyle();
+    }
 }

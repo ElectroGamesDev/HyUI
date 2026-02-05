@@ -29,11 +29,12 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 public class ActionButtonBuilder extends UIElementBuilder<ActionButtonBuilder> {
     private Boolean disabled;
     private String keyBindingLabel;
-    private String alignment;
+    private Alignment alignment;
     private String actionName;
 
     public ActionButtonBuilder() {
         super(UIElements.ACTION_BUTTON, "#HyUIActionButton");
+        withUiFile("Pages/Elements/ActionButton.ui");
         withWrappingGroup(true);
     }
 
@@ -51,7 +52,7 @@ public class ActionButtonBuilder extends UIElementBuilder<ActionButtonBuilder> {
         return this;
     }
 
-    public ActionButtonBuilder withAlignment(String alignment) {
+    public ActionButtonBuilder withAlignment(Alignment alignment) {
         this.alignment = alignment;
         return this;
     }
@@ -81,7 +82,7 @@ public class ActionButtonBuilder extends UIElementBuilder<ActionButtonBuilder> {
         }
         if (alignment != null) {
             HyUIPlugin.getLog().logFinest("Setting Alignment: " + alignment + " for " + selector);
-            commands.set(selector + ".Alignment", alignment);
+            commands.set(selector + ".Alignment", alignment.name());
         }
         if (actionName != null) {
             HyUIPlugin.getLog().logFinest("Setting ActionName: " + actionName + " for " + selector);

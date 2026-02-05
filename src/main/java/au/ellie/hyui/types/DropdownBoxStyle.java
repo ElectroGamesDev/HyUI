@@ -275,4 +275,12 @@ public class DropdownBoxStyle implements HyUIBsonSerializable {
         if (iconWidth != null) doc.set("IconWidth", iconWidth);
         if (iconHeight != null) doc.set("IconHeight", iconHeight);
     }
+
+    public static DropdownBoxStyle defaultStyle() {
+        return DefaultStyles.defaultDropdownBoxStyle();
+    }
+
+    public static DropdownBoxStyle titledStyle() {
+        return DefaultStyles.titledDropdownBoxStyle();
+    }
 }

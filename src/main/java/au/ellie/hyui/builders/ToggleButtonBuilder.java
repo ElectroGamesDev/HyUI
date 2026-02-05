@@ -31,6 +31,7 @@ import java.util.Set;
 public class ToggleButtonBuilder extends UIElementBuilder<ToggleButtonBuilder> {
     public ToggleButtonBuilder() {
         super(UIElements.TOGGLE_BUTTON, "#HyUIToggleButton");
+        withUiFile("Pages/Elements/ToggleButton.ui");
         withWrappingGroup(true);
     }
 

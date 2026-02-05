@@ -129,4 +129,8 @@ public class PopupMenuLayerStyle implements HyUIBsonSerializable {
         if (pressedItemBackground != null) doc.set("PressedItemBackground", pressedItemBackground.toBsonDocument());
         if (itemSounds != null) doc.set("ItemSounds", itemSounds.toBsonDocument());
     }
+
+    public static PopupMenuLayerStyle defaultStyle() {
+        return DefaultStyles.defaultPopupMenuLayerStyle();
+    }
 }

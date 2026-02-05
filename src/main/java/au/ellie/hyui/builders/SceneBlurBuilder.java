@@ -28,6 +28,7 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 public class SceneBlurBuilder extends UIElementBuilder<SceneBlurBuilder> {
     public SceneBlurBuilder() {
         super(UIElements.SCENE_BLUR, "#HyUISceneBlur");
+        withUiFile("Pages/Elements/SceneBlur.ui");
         withWrappingGroup(true);
     }
 

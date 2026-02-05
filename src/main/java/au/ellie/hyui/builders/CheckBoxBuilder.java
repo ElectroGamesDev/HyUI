@@ -22,6 +22,7 @@ import au.ellie.hyui.HyUIPlugin;
 import au.ellie.hyui.events.UIContext;
 import au.ellie.hyui.events.UIEventActions;
 import au.ellie.hyui.elements.UIElements;
+import au.ellie.hyui.utils.PropertyBatcher;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
@@ -158,7 +159,12 @@ public class CheckBoxBuilder extends UIElementBuilder<CheckBoxBuilder> {
         if ( hyUIStyle == null && typedStyle == null  && style != null) {
             HyUIPlugin.getLog().logFinest("Setting Style: " + style + " for " + selector);
             commands.set(selector + ".Style", style);
-        }
+        } 
+        // WE CANNOT set the underlying style of the child checkbox element.
+        /*else if (hyUIStyle == null && typedStyle != null) {
+            PropertyBatcher.endSet(selector + ".Style", typedStyle.toBsonDocument(), commands);
+        }*/
+        
         if (listeners.isEmpty()) {
             // To handle data back to the .getValue, we need to add at least one listener.
             addEventListener(CustomUIEventBindingType.ValueChanged, (_, _) -> {});

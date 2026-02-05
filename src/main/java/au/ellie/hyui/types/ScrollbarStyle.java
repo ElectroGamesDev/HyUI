@@ -68,6 +68,44 @@ public class ScrollbarStyle implements HyUIBsonSerializable {
         return this;
     }
 
+    public static ScrollbarStyle defaultStyle() {
+        return new ScrollbarStyle()
+                .withSpacing(6)
+                .withSize(6)
+                .withBackground(new HyUIPatchStyle()
+                        .setTexturePath("Common/Scrollbar.png")
+                        .setBorder(3))
+                .withHandle(new HyUIPatchStyle()
+                        .setTexturePath("Common/ScrollbarHandle.png")
+                        .setBorder(3))
+                .withHoveredHandle(new HyUIPatchStyle()
+                        .setTexturePath("Common/ScrollbarHandleHovered.png")
+                        .setBorder(3))
+                .withDraggedHandle(new HyUIPatchStyle()
+                        .setTexturePath("Common/ScrollbarHandleDragged.png")
+                        .setBorder(3));
+    }
+
+    public static ScrollbarStyle defaultExtraSpacingStyle() {
+        return defaultStyle().withSpacing(12);
+    }
+
+    public static ScrollbarStyle translucentStyle() {
+        return new ScrollbarStyle()
+                .withSpacing(6)
+                .withSize(6)
+                .withOnlyVisibleWhenHovered(true)
+                .withHandle(new HyUIPatchStyle()
+                        .setTexturePath("Common/ScrollbarHandle.png")
+                        .setBorder(3));
+    }
+
+    public static ScrollbarStyle defaultPlaceholderStyle() {
+        return new ScrollbarStyle()
+                .withSpacing(12)
+                .withSize(10);
+    }
+
     @Override
     public void applyTo(BsonDocumentHelper doc) {
         if (onlyVisibleWhenHovered != null) doc.set("OnlyVisibleWhenHovered", onlyVisibleWhenHovered);

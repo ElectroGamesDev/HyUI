@@ -28,6 +28,7 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 public class ReorderableListGripBuilder extends UIElementBuilder<ReorderableListGripBuilder> {
     public ReorderableListGripBuilder() {
         super(UIElements.REORDERABLE_LIST_GRIP, "#HyUIReorderableListGrip");
+        withUiFile("Pages/Elements/ReorderableListGrip.ui");
         withWrappingGroup(true);
     }
 

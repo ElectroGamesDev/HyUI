@@ -46,6 +46,7 @@ public class FloatSliderNumberFieldBuilder extends UIElementBuilder<FloatSliderN
 
     public FloatSliderNumberFieldBuilder() {
         super(UIElements.FLOAT_SLIDER_NUMBER_FIELD, "#HyUIFloatSliderNumberField");
+        withUiFile("Pages/Elements/FloatSliderNumberField.ui");
         withWrappingGroup(true);
     }
 

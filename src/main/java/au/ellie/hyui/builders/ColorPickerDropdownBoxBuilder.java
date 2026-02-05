@@ -25,15 +25,17 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 
 import java.util.Set;
 
+
 /**
  * Builder for ColorPickerDropdownBox UI elements.
  */
 public class ColorPickerDropdownBoxBuilder extends UIElementBuilder<ColorPickerDropdownBoxBuilder> {
-    private String format;
+    private ColorFormat format;
     private Boolean displayTextField;
 
     public ColorPickerDropdownBoxBuilder() {
         super(UIElements.COLOR_PICKER_DROPDOWN_BOX, "#HyUIColorPickerDropdownBox");
+        withUiFile("Pages/Elements/ColorPickerDropdownBox.ui");
         withWrappingGroup(true);
     }
 
@@ -41,7 +43,7 @@ public class ColorPickerDropdownBoxBuilder extends UIElementBuilder<ColorPickerD
         return new ColorPickerDropdownBoxBuilder();
     }
 
-    public ColorPickerDropdownBoxBuilder withFormat(String format) {
+    public ColorPickerDropdownBoxBuilder withFormat(ColorFormat format) {
         this.format = format;
         return this;
     }
@@ -84,7 +86,7 @@ public class ColorPickerDropdownBoxBuilder extends UIElementBuilder<ColorPickerD
 
         if (format != null) {
             HyUIPlugin.getLog().logFinest("Setting Format: " + format + " for " + selector);
-            commands.set(selector + ".Format", format);
+            commands.set(selector + ".Format", format.name());
         }
         if (displayTextField != null) {
             HyUIPlugin.getLog().logFinest("Setting DisplayTextField: " + displayTextField + " for " + selector);

@@ -63,4 +63,24 @@ public class TextButtonStyle implements HyUIBsonSerializable {
         if (disabled != null) doc.set("Disabled", disabled.toBsonDocument());
         if (sounds != null) doc.set("Sounds", sounds.toBsonDocument());
     }
+
+    public static TextButtonStyle primaryStyle() {
+        return DefaultStyles.primaryTextButtonStyle();
+    }
+
+    public static TextButtonStyle destructiveStyle() {
+        return DefaultStyles.destructiveTextButtonStyle();
+    }
+
+    public static TextButtonStyle secondaryStyle() {
+        return DefaultStyles.secondaryTextButtonStyle();
+    }
+
+    public static TextButtonStyle smallSecondaryStyle() {
+        return DefaultStyles.smallSecondaryTextButtonStyle();
+    }
+
+    public static TextButtonStyle tertiaryStyle() {
+        return DefaultStyles.tertiaryTextButtonStyle();
+    }
 }

@@ -29,10 +29,11 @@ import java.util.Set;
  * Builder for BlockSelector UI elements.
  */
 public class BlockSelectorBuilder extends UIElementBuilder<BlockSelectorBuilder> {
-    private Float capacity;
+    private Integer capacity;
 
     public BlockSelectorBuilder() {
         super(UIElements.BLOCK_SELECTOR, "#HyUIBlockSelector");
+        withUiFile("Pages/Elements/BlockSelector.ui");
         withWrappingGroup(true);
     }
 
@@ -40,7 +41,7 @@ public class BlockSelectorBuilder extends UIElementBuilder<BlockSelectorBuilder>
         return new BlockSelectorBuilder();
     }
 
-    public BlockSelectorBuilder withCapacity(float capacity) {
+    public BlockSelectorBuilder withCapacity(Integer capacity) {
         this.capacity = capacity;
         return this;
     }

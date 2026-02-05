@@ -121,4 +121,8 @@ public class FileDropdownBoxStyle implements HyUIBsonSerializable {
         if (panelOffset != null) doc.set("PanelOffset", panelOffset);
         if (sounds != null) doc.set("Sounds", sounds.toBsonDocument());
     }
+
+    public static FileDropdownBoxStyle defaultStyle() {
+        return DefaultStyles.defaultFileDropdownBoxStyle();
+    }
 }

@@ -42,4 +42,8 @@ public class CheckBoxStyle implements HyUIBsonSerializable {
         if (checked != null) doc.set("Checked", checked.toBsonDocument());
         if (unchecked != null) doc.set("Unchecked", unchecked.toBsonDocument());
     }
+
+    public static CheckBoxStyle defaultStyle() {
+        return DefaultStyles.defaultCheckBoxStyle();
+    }
 }

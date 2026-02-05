@@ -27,6 +27,7 @@ import au.ellie.hyui.utils.BsonDocumentHelper;
 import au.ellie.hyui.utils.PropertyBatcher;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import java.util.ArrayList;
@@ -577,22 +578,28 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
                 HyUIPlugin.getLog().logFinest("Setting FlexWeight: " + flexWeight + " for " + flexSelector);
                 commands.set(flexSelector + ".FlexWeight", flexWeight);
             }
-
-            if (typedStyle != null) {
+            
+            // Cannot set for checkbox builder.
+            if (typedStyle != null && !(this instanceof CheckBoxBuilder) && !(hyUIStyle != null && hyUIStyle.getStyleReference() != null)) {
                 BsonDocumentHelper doc = PropertyBatcher.beginSet();
                 typedStyle.applyTo(doc);
                 PropertyBatcher.endSet(selector + ".Style", doc, commands);
             } else if (hyUIStyle != null) {
-                BsonDocumentHelper doc = PropertyBatcher.beginSet();
-                applyStyle(commands, selector + ".Style", hyUIStyle, doc);
-                PropertyBatcher.endSet(selector + ".Style", doc, commands);
-                applyRawStyleProperties(commands, selector + ".Style", hyUIStyle);
-                hyUIStyle.getStates().forEach((state, nestedStyle) -> {
-                    BsonDocumentHelper innerDoc = PropertyBatcher.beginSet();
-                    applyStyle(commands, selector + ".Style." + state, nestedStyle, innerDoc);
-                    PropertyBatcher.endSet(selector + ".Style." + state, doc, commands);
-                    applyRawStyleProperties(commands, selector + ".Style." + state, nestedStyle);
-                });
+                if (hyUIStyle.getStyleReference() != null) {
+                    commands.set(selector + ".Style",
+                            Value.ref(hyUIStyle.getStyleDocument(), hyUIStyle.getStyleReference()));
+                } else {
+                    BsonDocumentHelper doc = PropertyBatcher.beginSet();
+                    applyStyle(commands, selector + ".Style", hyUIStyle, doc);
+                    PropertyBatcher.endSet(selector + ".Style", doc, commands);
+                    applyRawStyleProperties(commands, selector + ".Style", hyUIStyle);
+                    hyUIStyle.getStates().forEach((state, nestedStyle) -> {
+                        BsonDocumentHelper innerDoc = PropertyBatcher.beginSet();
+                        applyStyle(commands, selector + ".Style." + state, nestedStyle, innerDoc);
+                        PropertyBatcher.endSet(selector + ".Style." + state, innerDoc, commands);
+                        applyRawStyleProperties(commands, selector + ".Style." + state, nestedStyle);
+                    });
+                }
             }
 
             secondaryTypedStyles.forEach((property, style) -> {
@@ -602,6 +609,11 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
             });
 
             secondaryStyles.forEach((property, style) -> {
+                if (style.getStyleReference() != null) {
+                    commands.set(selector + "." + property,
+                            Value.ref(style.getStyleDocument(), style.getStyleReference()));
+                    return;
+                }
                 BsonDocumentHelper doc = PropertyBatcher.beginSet();
                 applyStyle(commands, selector + "." + property, style, doc);
                 PropertyBatcher.endSet(selector + "." + property, doc, commands);
@@ -609,7 +621,7 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
                 style.getStates().forEach((state, nestedStyle) -> {
                     BsonDocumentHelper innerDoc = PropertyBatcher.beginSet();
                     applyStyle(commands, selector + "." + property + "." + state, nestedStyle, innerDoc);
-                    PropertyBatcher.endSet(selector + "." + property + "." + state, doc, commands);
+                    PropertyBatcher.endSet(selector + "." + property + "." + state, innerDoc, commands);
                     applyRawStyleProperties(commands, selector + "." + property + "." + state, nestedStyle);
                 });
             });
@@ -687,7 +699,7 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> {
     protected void applyStyle(UICommandBuilder commands, String prefix, HyUIStyle style, BsonDocumentHelper doc) {
         if (style.getStyleReference() != null) {
             HyUIPlugin.getLog().logFinest("Applying style reference: " + style.getStyleDocument() + " -> " + style.getStyleReference() + " to " + prefix);
-            commands.set(prefix, com.hypixel.hytale.server.core.ui.Value.ref(style.getStyleDocument(), style.getStyleReference()));
+            commands.set(prefix, Value.ref(style.getStyleDocument(), style.getStyleReference()));
             return;
         }
 

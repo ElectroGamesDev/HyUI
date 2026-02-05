@@ -63,4 +63,24 @@ public class ButtonStyle implements HyUIBsonSerializable {
         if (disabled != null) doc.set("Disabled", disabled.toBsonDocument());
         if (sounds != null) doc.set("Sounds", sounds.toBsonDocument());
     }
+
+    public static ButtonStyle primaryStyle() {
+        return DefaultStyles.primaryButtonStyle();
+    }
+
+    public static ButtonStyle primarySquareStyle() {
+        return DefaultStyles.primarySquareButtonStyle();
+    }
+
+    public static ButtonStyle destructiveStyle() {
+        return DefaultStyles.destructiveButtonStyle();
+    }
+
+    public static ButtonStyle secondaryStyle() {
+        return DefaultStyles.secondaryButtonStyle();
+    }
+
+    public static ButtonStyle tertiaryStyle() {
+        return DefaultStyles.tertiaryButtonStyle();
+    }
 }
