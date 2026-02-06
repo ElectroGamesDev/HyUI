@@ -53,7 +53,7 @@ public class HyUIPage extends InteractiveCustomUIPage<DynamicPageData> implement
                     CustomPageLifetime lifetime,
                     String uiFile,
                     List<UIElementBuilder<?>> elements,
-                    List<Consumer<UICommandBuilder>> editCallbacks,
+                    List<BiConsumer<UICommandBuilder, UIEventBuilder>> editCallbacks,
                     String templateHtml,
                     TemplateProcessor templateProcessor,
                     boolean runtimeTemplateUpdatesEnabled,
