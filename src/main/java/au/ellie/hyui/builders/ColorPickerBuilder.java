@@ -37,7 +37,7 @@ import java.util.function.Consumer;
  */
 public class ColorPickerBuilder extends UIElementBuilder<ColorPickerBuilder> {
     private String value;
-    private String format;
+    private ColorFormat format;
 
     /**
      * Constructs a new instance of {@code ColorPickerBuilder}, initializing it with
@@ -75,7 +75,7 @@ public class ColorPickerBuilder extends UIElementBuilder<ColorPickerBuilder> {
      * @param format the format (e.g. Rgb)
      * @return the {@code ColorPickerBuilder} instance for method chaining.
      */
-    public ColorPickerBuilder withFormat(String format) {
+    public ColorPickerBuilder withFormat(ColorFormat format) {
         this.format = format;
         return this;
     }
@@ -153,7 +153,7 @@ public class ColorPickerBuilder extends UIElementBuilder<ColorPickerBuilder> {
         }
         if (format != null) {
             HyUIPlugin.getLog().logFinest("Setting Format: " + format + " for " + selector);
-            commands.set(selector + ".Format", format);
+            commands.set(selector + ".Format", format.name());
         }
 
         if ( hyUIStyle == null && typedStyle == null  && style != null) {
