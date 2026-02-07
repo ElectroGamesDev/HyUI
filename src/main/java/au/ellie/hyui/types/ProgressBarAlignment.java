@@ -16,9 +16,12 @@
  *
  */
 
-package au.ellie.hyui.builders;
+package au.ellie.hyui.types;
 
-public enum ColorFormat {
-    Rgb,
-    Rgba
+/**
+ * Enum for progress bar alignment.
+ */
+public enum ProgressBarAlignment {
+    Vertical,
+    Horizontal
 }
