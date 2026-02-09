@@ -142,6 +142,54 @@ public class LabelBuilder extends UIElementBuilder<LabelBuilder> {
     }
 
     @Override
+    protected boolean hasCustomInlineContent() {
+        return padding != null;
+    }
+
+    @Override
+    protected String generateCustomInlineContent() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(elementPath);
+        if (id != null && !wrapInGroup) {
+            sb.append(" #").append(id);
+        }
+        sb.append(" { ");
+
+        // Not really necessary from what I can gather, we already override this with the .Background request.
+        // But might as well have it just in case.
+        HyUIPatchStyle bg = this.getBackground();
+        if (bg != null && bg.getTexturePath() == null && bg.getColor() != null && bg.getColor().contains("(")) {
+            sb.append("Background: ").append(bg.getColor()).append("; ");
+        }
+
+        // Restore padding like prior versions, why did I delete this?? I think I was trying to remove
+        // BackgroundSupported interface implementations.
+        if (padding != null) {
+            StringBuilder paddingMarkup = new StringBuilder();
+            if (padding.getLeft() != null) paddingMarkup.append("Left: ").append(padding.getLeft());
+            if (padding.getTop() != null) {
+                if (!paddingMarkup.isEmpty()) paddingMarkup.append(", ");
+                paddingMarkup.append("Top: ").append(padding.getTop());
+            }
+            if (padding.getRight() != null) {
+                if (!paddingMarkup.isEmpty()) paddingMarkup.append(", ");
+                paddingMarkup.append("Right: ").append(padding.getRight());
+            }
+            if (padding.getBottom() != null) {
+                if (!paddingMarkup.isEmpty()) paddingMarkup.append(", ");
+                paddingMarkup.append("Bottom: ").append(padding.getBottom());
+            }
+            if (!paddingMarkup.isEmpty()) {
+                sb.append("Padding: (").append(paddingMarkup).append("); ");
+            }
+        }
+
+        sb.append("}");
+        return sb.toString();
+    }
+
+
+    @Override
     protected void onBuild(UICommandBuilder commands, UIEventBuilder events) {
         String selector = getSelector();
         if (selector == null) return;
