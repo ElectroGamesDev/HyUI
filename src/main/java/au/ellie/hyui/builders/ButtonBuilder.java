@@ -388,19 +388,24 @@ public class ButtonBuilder extends UIElementBuilder<ButtonBuilder> implements
         if (isBackButton()) {
             return Set.of();
         }
-        Set<String> supported = new HashSet<>(Set.of(
-                "FontSize",
-                "RenderBold",
-                "RenderUppercase",
-                "TextColor",
-                "HorizontalAlignment",
-                "VerticalAlignment",
-                "Alignment",
-                "RenderItalics",
-                "FontName",
-                "Wrap",
-                "LetterSpacing",
-                "OutlineColor"
+        Set<String> supported = new HashSet<>(StylePropertySets.merge(
+                StylePropertySets.PATCH_STYLE,
+                StylePropertySets.ANCHOR,
+                StylePropertySets.PADDING,
+                Set.of(
+                        "FontSize",
+                        "RenderBold",
+                        "RenderUppercase",
+                        "TextColor",
+                        "HorizontalAlignment",
+                        "VerticalAlignment",
+                        "Alignment",
+                        "RenderItalics",
+                        "FontName",
+                        "Wrap",
+                        "LetterSpacing",
+                        "OutlineColor"
+                )
         ));
         if (this.theme == Theme.GAME_THEME) {
             supported.remove("FontSize");

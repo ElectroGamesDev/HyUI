@@ -486,6 +486,17 @@ public class HyUITestGuiCommand extends AbstractAsyncCommand {
                         )*/
                         .addChild(ButtonBuilder.textButton()
                                 .withText("Button with Icon")
+                                .withStyle(ButtonStyle.primaryStyle()
+                                    .withDefault(
+                                            new ButtonStyleState()
+                                                    .withBackground(
+                                                            new HyUIPatchStyle().setTexturePath("Pages/Assets/Tab.png")))
+                                    .withHovered(
+                                            new ButtonStyleState()
+                                                    .withBackground(
+                                                            new HyUIPatchStyle().setTexturePath("Pages/Assets/TabOverlay.png"))
+                                                    )
+                                    )
                                 .onDoubleClicking((mouseEventData) -> {
                                     playerRef.sendMessage(Message.raw("Button with Icon double clicked: " + mouseEventData));
                                 })
