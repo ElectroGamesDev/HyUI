@@ -181,8 +181,8 @@ public class PageBuilder extends InterfaceBuilder<PageBuilder> {
                 onDismissListener);
         this.lastPage.setRefreshRateMs(refreshRateMs);
         this.lastPage.setRefreshListener(refreshListener);
-        pageManager.openCustomPage(playerRefParam.getReference(), store, this.lastPage);
         if (asyncImageLoadingEnabled) {
+            
             HyUIPage openedPage = this.lastPage;
             var world = store.getExternalData().getWorld();
             sendDynamicImageIfNeededAsync(playerRefParam, dynamicImage -> {
@@ -192,8 +192,10 @@ public class PageBuilder extends InterfaceBuilder<PageBuilder> {
                 }
                 world.execute(() -> openedPage.reloadImage(id, false, false));
             });
+            pageManager.openCustomPage(playerRefParam.getReference(), store, this.lastPage);
         } else {
             sendDynamicImageIfNeeded(playerRefParam);
+            pageManager.openCustomPage(playerRefParam.getReference(), store, this.lastPage);
         }
         return this.lastPage;
     }
