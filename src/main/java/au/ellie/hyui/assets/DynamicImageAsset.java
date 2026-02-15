@@ -136,7 +136,7 @@ public class DynamicImageAsset extends CommonAsset {
         //packets[packets.length - 1] = new AssetFinalize();
         handler.write(packets, new AssetFinalize());*/
         
-        Packet[] packets = new Packet[1 + parts.length];
+        Packet[] packets = new Packet[2 + parts.length];
         packets[0] = new AssetInitialize(asset.toPacket(), allBytes.length);
 
         for(int partIndex = 0; partIndex < parts.length; ++partIndex) {
