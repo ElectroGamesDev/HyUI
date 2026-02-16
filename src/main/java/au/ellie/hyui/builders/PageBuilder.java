@@ -178,7 +178,8 @@ public class PageBuilder extends InterfaceBuilder<PageBuilder> {
                 templateHtml, 
                 templateProcessor, 
                 runtimeTemplateUpdatesEnabled,
-                onDismissListener);
+                onDismissListener,
+                this);
         this.lastPage.setRefreshRateMs(refreshRateMs);
         this.lastPage.setRefreshListener(refreshListener);
         if (asyncImageLoadingEnabled) {

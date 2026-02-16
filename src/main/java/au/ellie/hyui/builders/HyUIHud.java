@@ -61,10 +61,11 @@ public class HyUIHud extends CustomUIHud implements UIContext {
                    List<BiConsumer<UICommandBuilder, UIEventBuilder>> editCallbacks,
                    String templateHtml,
                    TemplateProcessor templateProcessor,
-                   boolean runtimeTemplateUpdatesEnabled) {
+                   boolean runtimeTemplateUpdatesEnabled,
+                   InterfaceBuilder<?> rootElementBuilder) {
         super(playerRef);
         this.name = name;
-        this.delegate = new HyUInterface(uiFile, elements, editCallbacks, templateHtml, templateProcessor, runtimeTemplateUpdatesEnabled) {};
+        this.delegate = new HyUInterface(uiFile, elements, editCallbacks, templateHtml, templateProcessor, runtimeTemplateUpdatesEnabled, rootElementBuilder) {};
     }
 
     private void startRefreshTask() {

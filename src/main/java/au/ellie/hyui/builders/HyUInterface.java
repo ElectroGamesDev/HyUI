@@ -19,14 +19,18 @@
 package au.ellie.hyui.builders;
 
 import au.ellie.hyui.HyUIPluginLogger;
+import au.ellie.hyui.elements.UIType;
 import au.ellie.hyui.events.*;
 import au.ellie.hyui.html.HtmlParser;
 import au.ellie.hyui.html.TemplateProcessor;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.protocol.Asset;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import au.ellie.hyui.HyUIPlugin;
 
@@ -39,7 +43,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.UUID;
 
 public abstract class HyUInterface implements UIContext {
@@ -53,6 +56,7 @@ public abstract class HyUInterface implements UIContext {
     protected TemplateProcessor templateProcessor;
     private boolean hasBuilt;
     private boolean runtimeTemplateUpdatesEnabled;
+    private final InterfaceBuilder<?> rootElementBuilder;
     private final Set<String> dirtyValueIds = new HashSet<>();
 
     public HyUInterface(String uiFile,
@@ -60,13 +64,15 @@ public abstract class HyUInterface implements UIContext {
                         List<BiConsumer<UICommandBuilder, UIEventBuilder>> editCallbacks,
                         String templateHtml,
                         TemplateProcessor templateProcessor,
-                        boolean runtimeTemplateUpdatesEnabled) {
+                        boolean runtimeTemplateUpdatesEnabled,
+                        InterfaceBuilder<?> rootElementBuilder) {
         this.uiFile = uiFile;
         this.elements = elements;
         this.editCallbacks = editCallbacks;
         this.templateHtml = templateHtml;
         this.templateProcessor = templateProcessor;
         this.runtimeTemplateUpdatesEnabled = runtimeTemplateUpdatesEnabled;
+        this.rootElementBuilder = rootElementBuilder;
     }
 
     @Override
@@ -571,6 +577,39 @@ public abstract class HyUInterface implements UIContext {
             }
             if (!element.children.isEmpty()) {
                 reapplyTabSelections(element.children, context);
+            }
+        }
+    }
+
+    public void reopenFromAsset(Player player, PlayerRef ref, Store<EntityStore> store, Asset asset) {
+        if (rootElementBuilder instanceof PageBuilder pageBuilder) {
+            // TODO: EndsWith or some parsing?
+            if (uiFile != null && asset.name.contains(uiFile)) {
+                pageBuilder.fromFile(uiFile);
+                pageBuilder.open(ref, store);
+            }
+            // Generally the resource html path is more specific than the asset name.
+            if (pageBuilder.htmlFilePath.contains(asset.name)) {
+                var normalizedHtmlPath = pageBuilder.htmlFilePath.replace("/Common/UI/Custom/", "");
+                var style = pageBuilder.uiStyleFilePath != null ? 
+                        pageBuilder.uiStyleFilePath.contains("hywind") ? UIType.HYWIND : UIType.NONE
+                        : UIType.NONE;
+                
+                // We need to "reload" the changed asset.
+                // Other information such as events is still captured on the page builder.
+                if (pageBuilder.templateProcessor != null) {
+                    pageBuilder.loadHtml(
+                            normalizedHtmlPath,
+                            pageBuilder.templateProcessor, style
+                            
+                    );
+                } else {
+                    pageBuilder.loadHtml(normalizedHtmlPath, 
+                            style);
+                }
+                // We CANNOT "reload" html from inline stuff, so we are stuck here with just opening the page.
+                // Users of this mod should opt to store their HTML in files if they use it.
+                pageBuilder.open(ref, store);
             }
         }
     }

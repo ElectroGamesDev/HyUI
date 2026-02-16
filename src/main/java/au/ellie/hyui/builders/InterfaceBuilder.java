@@ -53,6 +53,8 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
     protected boolean runtimeTemplateUpdatesEnabled;
     protected boolean asyncImageLoadingEnabled;
     private static final ExecutorService DYNAMIC_IMAGE_EXECUTOR = Executors.newCachedThreadPool();
+    protected String htmlFilePath;
+    protected String uiStyleFilePath;
 
     @SuppressWarnings("unchecked")
     protected T self() {
@@ -140,7 +142,11 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
     }
     
     private String loadHtmlFromResources(String resourceFileName) {
+        if (!resourceFileName.equals("/Common/UI/Custom/Pages/Styles/hywind.html")) {
+            htmlFilePath = resourceFileName;
+        }
         String normalized = resourceFileName.startsWith("/") ? resourceFileName.substring(1) : resourceFileName;
+        
         List<Path> candidatePaths = List.of(
                 Paths.get("src/main/resources").resolve(normalized),
                 Paths.get("..", "src", "main", "resources").resolve(normalized),
@@ -153,6 +159,7 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
                 try {
                     return Files.readString(path, StandardCharsets.UTF_8);
                 } catch (IOException e) {
+                    htmlFilePath = null;
                     throw new RuntimeException("Failed to load HTML from file: " + path, e);
                 }
             }
@@ -163,14 +170,16 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
             }
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
+            htmlFilePath = null;
             throw new RuntimeException("Failed to load HTML from resource: " + resourceFileName, e);
         }
     }
 
     private String addUIStyleToHtml(String html, UIType style) {
-        String uiStyleFilePath = null;
+        uiStyleFilePath = null;
         if (Objects.requireNonNull(style) == UIType.HYWIND) {
             uiStyleFilePath = "/Common/UI/Custom/Pages/Styles/hywind.html";
+            
         } else {
             return html;
         }
@@ -564,5 +573,9 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
 
     public boolean isRuntimeTemplateUpdatesEnabled() {
         return runtimeTemplateUpdatesEnabled;
+    }
+
+    public String getHtmlFilePath() {
+        return htmlFilePath;
     }
 }
