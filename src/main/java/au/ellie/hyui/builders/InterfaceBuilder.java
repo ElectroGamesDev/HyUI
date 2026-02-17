@@ -448,7 +448,7 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
         return self();
     }
     
-    protected void sendDynamicImageIfNeeded(PlayerRef pRef) {
+    public void sendDynamicImageIfNeeded(PlayerRef pRef) {
         if (pRef == null || !pRef.isValid()) {
             return;
         }
@@ -463,7 +463,7 @@ public abstract class InterfaceBuilder<T extends InterfaceBuilder<T>> {
         }
     }
 
-    protected void sendDynamicImageIfNeededAsync(PlayerRef pRef, Consumer<DynamicImageBuilder> onComplete) {
+    public void sendDynamicImageIfNeededAsync(PlayerRef pRef, Consumer<DynamicImageBuilder> onComplete) {
         if (pRef == null || !pRef.isValid()) {
             return;
         }

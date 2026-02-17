@@ -137,10 +137,11 @@ public class HyUIPlugin extends JavaPlugin {
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                    String html = "<hyvatar username='" + player.getDisplayName() + "' size='64'></hyvatar><div style='anchor-width: 400; anchor-height: 50;'><progress value='50' max='100' data-hyui-bar-texture-path='Common/ShopTest.png'></progress></div>";
+                    String html = "Pages/HudTest.html";
                     var tp = new TemplateProcessor();
+                    tp.setVariable("playerName", player.getDisplayName());
                     var hud = HudBuilder.detachedHud()
-                            .fromTemplate(html, tp)
+                            .loadHtml(html, tp)
                             .withRefreshRate(1000)
                             .onRefresh((h) -> {
                                 h.getById("text", LabelBuilder.class).ifPresent((builder) -> {
