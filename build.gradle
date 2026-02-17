@@ -32,12 +32,13 @@ javadoc {
 
 hytale {
     // Versioning
-    patchline = "pre-release"
+    patchline = "release"
 
     // Manifest auto update
     manifest {
         version = project.version.toString()
         // Pre-release 2026.02.11-891910c77
+        // Release 2026.02.17-255364b8e
         serverVersion = "*"
         author(author_name, "ellie@ellie.au", "https://ellie.au")
         optionalDependencies.put("Buuz135:MultipleHUD", "*");

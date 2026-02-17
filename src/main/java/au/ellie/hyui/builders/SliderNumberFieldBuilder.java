@@ -87,12 +87,12 @@ public class SliderNumberFieldBuilder extends UIElementBuilder<SliderNumberField
         return this;
     }
 
-    public SliderNumberFieldBuilder addEventListener(CustomUIEventBindingType type, Consumer<Double> callback) {
-        return addEventListener(type, Double.class, callback);
+    public SliderNumberFieldBuilder addEventListener(CustomUIEventBindingType type, Consumer<Integer> callback) {
+        return addEventListener(type, Integer.class, callback);
     }
 
-    public SliderNumberFieldBuilder addEventListener(CustomUIEventBindingType type, BiConsumer<Double, UIContext> callback) {
-        return addEventListenerWithContext(type, Double.class, callback);
+    public SliderNumberFieldBuilder addEventListener(CustomUIEventBindingType type, BiConsumer<Integer, UIContext> callback) {
+        return addEventListenerWithContext(type, Integer.class, callback);
     }
 
     @Override
