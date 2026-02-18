@@ -25,7 +25,7 @@ import au.ellie.hyui.events.UIContext;
 import au.ellie.hyui.html.TemplateProcessor;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.protocol.Asset;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPage;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.server.core.entity.entities.Player;
@@ -38,7 +38,6 @@ import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class HyUIPage extends InteractiveCustomUIPage<DynamicPageData> implements UIContext {
@@ -58,12 +57,18 @@ public class HyUIPage extends InteractiveCustomUIPage<DynamicPageData> implement
                     String templateHtml,
                     TemplateProcessor templateProcessor,
                     boolean runtimeTemplateUpdatesEnabled,
-                    BiConsumer<HyUIPage, Boolean> onDismissListener) {
+                    BiConsumer<HyUIPage, Boolean> onDismissListener,
+                    InterfaceBuilder<?> rootElementBuilder) {
         super(playerRef, lifetime, DynamicPageData.CODEC);
         this.onDismissListener = onDismissListener;
-        this.delegate = new HyUInterface(uiFile, elements, editCallbacks, templateHtml, templateProcessor, runtimeTemplateUpdatesEnabled) {};
+        this.delegate = new HyUInterface(uiFile, elements, editCallbacks, templateHtml, templateProcessor, runtimeTemplateUpdatesEnabled, rootElementBuilder) {};
     }
 
+    public void reopenFromAsset(Player player, PlayerRef ref, Store<EntityStore> store, Asset asset) {
+        //this.close();
+        delegate.reopenFromAsset(player, ref, store, asset);
+    }
+    
     private void startRefreshTask() {
         if (refreshTask == null || refreshTask.isCancelled()) {
             refreshTask = scheduler.scheduleAtFixedRate(
