@@ -20,9 +20,11 @@ package au.ellie.hyui.builders;
 
 import au.ellie.hyui.HyUIPlugin;
 import au.ellie.hyui.elements.BackgroundSupported;
+import au.ellie.hyui.elements.ScrollbarStyleSupported;
 import au.ellie.hyui.elements.UIElements;
 import au.ellie.hyui.events.UIContext;
 import au.ellie.hyui.events.UIEventActions;
+import au.ellie.hyui.types.ScrollbarStyle;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
@@ -35,7 +37,11 @@ import java.util.function.Consumer;
 /**
  * Builder for Panel UI elements.
  */
-public class PanelBuilder extends UIElementBuilder<PanelBuilder> {
+public class PanelBuilder extends UIElementBuilder<PanelBuilder> implements ScrollbarStyleSupported<PanelBuilder> {
+    private String scrollbarStyleReference;
+    private String scrollbarStyleDocument;
+    private ScrollbarStyle scrollbarStyle;
+
     public PanelBuilder() {
         super(UIElements.PANEL, "#HyUIPanel");
         withUiFile("Pages/Elements/Panel.ui");
@@ -75,6 +81,37 @@ public class PanelBuilder extends UIElementBuilder<PanelBuilder> {
     }
 
     @Override
+    public PanelBuilder withScrollbarStyle(String document, String styleReference) {
+        this.scrollbarStyleDocument = document;
+        this.scrollbarStyleReference = styleReference;
+        this.scrollbarStyle = null;
+        return this;
+    }
+
+    @Override
+    public PanelBuilder withScrollbarStyle(ScrollbarStyle style) {
+        this.scrollbarStyle = style;
+        this.scrollbarStyleDocument = null;
+        this.scrollbarStyleReference = null;
+        return this;
+    }
+
+    @Override
+    public String getScrollbarStyleReference() {
+        return scrollbarStyleReference;
+    }
+
+    @Override
+    public ScrollbarStyle getScrollbarStyle() {
+        return scrollbarStyle;
+    }
+
+    @Override
+    public String getScrollbarStyleDocument() {
+        return scrollbarStyleDocument;
+    }
+
+    @Override
     protected boolean supportsStyling() {
         return false;
     }
@@ -93,6 +130,8 @@ public class PanelBuilder extends UIElementBuilder<PanelBuilder> {
     protected void onBuild(UICommandBuilder commands, UIEventBuilder events) {
         String selector = getSelector();
         if (selector == null) return;
+
+        applyScrollbarStyle(commands, selector);
 
         // Register event listeners
         listeners.forEach(listener -> {

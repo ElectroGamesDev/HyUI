@@ -1037,6 +1037,14 @@ public abstract class UIElementBuilder<T extends UIElementBuilder<T>> implements
             HyUIPlugin.getLog().logFinest("Setting Style FontSize: " + style.getFontSize() + " for " + prefix);
             doc.set("FontSize", style.getFontSize().doubleValue());
         }
+        if (style.getMinShrinkTextToFitFontSize() != null && isAllowed.test("MinShrinkTextToFitFontSize")) {
+            HyUIPlugin.getLog().logFinest("Setting Style MinShrinkTextToFitFontSize: " + style.getMinShrinkTextToFitFontSize() + " for " + prefix);
+            doc.set("MinShrinkTextToFitFontSize", style.getMinShrinkTextToFitFontSize().doubleValue());
+        }
+        if (style.getShrinkTextToFit() != null && isAllowed.test("ShrinkTextToFit")) {
+            HyUIPlugin.getLog().logFinest("Setting Style ShrinkTextToFit: " + style.getShrinkTextToFit() + " for " + prefix);
+            doc.set("ShrinkTextToFit", style.getShrinkTextToFit());
+        }
         if (style.getRenderBold() != null && isAllowed.test("RenderBold")) {
             HyUIPlugin.getLog().logFinest("Setting Style RenderBold: " + style.getRenderBold() + " for " + prefix);
             doc.set("RenderBold", style.getRenderBold());

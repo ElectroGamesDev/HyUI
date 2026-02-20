@@ -28,6 +28,8 @@ import java.util.Map;
 public class HyUIStyle {
 
     private Float fontSize;
+    private Float minShrinkTextToFitFontSize;
+    private Boolean shrinkTextToFit;
     private Boolean renderBold;
     private Boolean renderItalics;
     private Boolean renderUppercase;
@@ -61,6 +63,29 @@ public class HyUIStyle {
         fontSize = cleanUnits(fontSize);
         ParseUtils.parseFloat(fontSize)
                 .ifPresent(v -> this.fontSize = v);
+        return this;
+    }
+
+    public HyUIStyle setMinShrinkTextToFitFontSize(float minShrinkTextToFitFontSize) {
+        this.minShrinkTextToFitFontSize = minShrinkTextToFitFontSize;
+        return this;
+    }
+
+    public HyUIStyle setMinShrinkTextToFitFontSize(String minShrinkTextToFitFontSize) {
+        minShrinkTextToFitFontSize = cleanUnits(minShrinkTextToFitFontSize);
+        ParseUtils.parseFloat(minShrinkTextToFitFontSize)
+                .ifPresent(v -> this.minShrinkTextToFitFontSize = v);
+        return this;
+    }
+
+    public HyUIStyle setShrinkTextToFit(boolean shrinkTextToFit) {
+        this.shrinkTextToFit = shrinkTextToFit;
+        return this;
+    }
+
+    public HyUIStyle setShrinkTextToFit(String shrinkTextToFit) {
+        shrinkTextToFit = cleanUnits(shrinkTextToFit);
+        this.shrinkTextToFit = Boolean.parseBoolean(shrinkTextToFit);
         return this;
     }
 
@@ -210,6 +235,14 @@ public class HyUIStyle {
         return fontSize;
     }
 
+    public Float getMinShrinkTextToFitFontSize() {
+        return minShrinkTextToFitFontSize;
+    }
+
+    public Boolean getShrinkTextToFit() {
+        return shrinkTextToFit;
+    }
+
     public Boolean getRenderBold() {
         return renderBold;
     }
@@ -266,6 +299,8 @@ public class HyUIStyle {
     public String toString() {
         return "HyUIStyle{" +
                 "fontSize=" + fontSize +
+                ", minShrinkTextToFitFontSize=" + minShrinkTextToFitFontSize +
+                ", shrinkTextToFit=" + shrinkTextToFit +
                 ", renderBold=" + renderBold +
                 ", renderItalics=" + renderItalics +
                 ", renderUppercase=" + renderUppercase +
@@ -290,6 +325,16 @@ public class HyUIStyle {
         boolean isFirst = true;
         if (fontSize != null) {
             sb.append("FontSize: ").append(fontSize.intValue());
+            isFirst = false;
+        }
+        if (minShrinkTextToFitFontSize != null) {
+            if (!isFirst) sb.append(", ");
+            sb.append("MinShrinkTextToFitFontSize: ").append(minShrinkTextToFitFontSize.intValue());
+            isFirst = false;
+        }
+        if (shrinkTextToFit != null) {
+            if (!isFirst) sb.append(", ");
+            sb.append("ShrinkTextToFit: ").append(shrinkTextToFit);
             isFirst = false;
         }
         if (fontName != null) {
@@ -362,6 +407,8 @@ public class HyUIStyle {
     public BsonDocument toBsonDocument() {
         BsonDocumentHelper doc = new BsonDocumentHelper();
         if (fontSize != null) doc.set("FontSize", fontSize.doubleValue());
+        if (minShrinkTextToFitFontSize != null) doc.set("MinShrinkTextToFitFontSize", minShrinkTextToFitFontSize.doubleValue());
+        if (shrinkTextToFit != null) doc.set("ShrinkTextToFit", shrinkTextToFit);
         if (fontName != null) doc.set("FontName", fontName);
         if (letterSpacing != null) doc.set("LetterSpacing", letterSpacing);
         if (textColor != null) doc.set("TextColor", textColor);

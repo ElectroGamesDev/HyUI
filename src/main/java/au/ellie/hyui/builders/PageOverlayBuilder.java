@@ -22,6 +22,7 @@ import au.ellie.hyui.elements.BackgroundSupported;
 import au.ellie.hyui.elements.LayoutModeSupported;
 import au.ellie.hyui.elements.ScrollbarStyleSupported;
 import au.ellie.hyui.elements.UIElements;
+import au.ellie.hyui.types.ScrollbarStyle;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import java.util.Set;
@@ -34,6 +35,7 @@ public class PageOverlayBuilder extends UIElementBuilder<PageOverlayBuilder> imp
     private HyUIPatchStyle background;
     private String scrollbarStyleReference;
     private String scrollbarStyleDocument;
+    private ScrollbarStyle scrollbarStyle;
 
     public PageOverlayBuilder() {
         super(UIElements.PAGE_OVERLAY, "#HyUIPageOverlay");
@@ -76,12 +78,26 @@ public class PageOverlayBuilder extends UIElementBuilder<PageOverlayBuilder> imp
     public PageOverlayBuilder withScrollbarStyle(String document, String styleReference) {
         this.scrollbarStyleDocument = document;
         this.scrollbarStyleReference = styleReference;
+        this.scrollbarStyle = null;
+        return this;
+    }
+
+    @Override
+    public PageOverlayBuilder withScrollbarStyle(ScrollbarStyle style) {
+        this.scrollbarStyle = style;
+        this.scrollbarStyleDocument = null;
+        this.scrollbarStyleReference = null;
         return this;
     }
 
     @Override
     public String getScrollbarStyleReference() {
         return this.scrollbarStyleReference;
+    }
+
+    @Override
+    public ScrollbarStyle getScrollbarStyle() {
+        return this.scrollbarStyle;
     }
 
     @Override

@@ -26,6 +26,7 @@ import au.ellie.hyui.elements.UIElements;
 import au.ellie.hyui.events.UIContext;
 import au.ellie.hyui.events.UIEventActions;
 import au.ellie.hyui.theme.Theme;
+import au.ellie.hyui.types.ScrollbarStyle;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
@@ -48,6 +49,7 @@ public class GroupBuilder extends UIElementBuilder<GroupBuilder> implements
     private String layoutMode;
     private String scrollbarStyleReference;
     private String scrollbarStyleDocument;
+    private ScrollbarStyle scrollbarStyle;
 
     public GroupBuilder() {
         super(UIElements.GROUP, "Group");
@@ -87,12 +89,26 @@ public class GroupBuilder extends UIElementBuilder<GroupBuilder> implements
     public GroupBuilder withScrollbarStyle(String document, String styleReference) {
         this.scrollbarStyleDocument = document;
         this.scrollbarStyleReference = styleReference;
+        this.scrollbarStyle = null;
+        return this;
+    }
+
+    @Override
+    public GroupBuilder withScrollbarStyle(ScrollbarStyle style) {
+        this.scrollbarStyle = style;
+        this.scrollbarStyleDocument = null;
+        this.scrollbarStyleReference = null;
         return this;
     }
 
     @Override
     public String getScrollbarStyleReference() {
         return this.scrollbarStyleReference;
+    }
+
+    @Override
+    public ScrollbarStyle getScrollbarStyle() {
+        return this.scrollbarStyle;
     }
 
     @Override

@@ -24,6 +24,7 @@ import au.ellie.hyui.elements.BackgroundSupported;
 import au.ellie.hyui.elements.LayoutModeSupported;
 import au.ellie.hyui.elements.ScrollbarStyleSupported;
 import au.ellie.hyui.elements.UIElements;
+import au.ellie.hyui.types.ScrollbarStyle;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ public class DynamicImageBuilder extends UIElementBuilder<DynamicImageBuilder>
     private String layoutMode;
     private String scrollbarStyleReference;
     private String scrollbarStyleDocument;
+    private ScrollbarStyle scrollbarStyle;
     private String imageUrl;
     private boolean imagePathAssigned;
     private final Map<UUID, Integer> slotIndexes = new HashMap<>();
@@ -136,12 +138,26 @@ public class DynamicImageBuilder extends UIElementBuilder<DynamicImageBuilder>
     public DynamicImageBuilder withScrollbarStyle(String document, String styleReference) {
         this.scrollbarStyleDocument = document;
         this.scrollbarStyleReference = styleReference;
+        this.scrollbarStyle = null;
+        return this;
+    }
+
+    @Override
+    public DynamicImageBuilder withScrollbarStyle(ScrollbarStyle style) {
+        this.scrollbarStyle = style;
+        this.scrollbarStyleDocument = null;
+        this.scrollbarStyleReference = null;
         return this;
     }
 
     @Override
     public String getScrollbarStyleReference() {
         return this.scrollbarStyleReference;
+    }
+
+    @Override
+    public ScrollbarStyle getScrollbarStyle() {
+        return this.scrollbarStyle;
     }
 
     @Override

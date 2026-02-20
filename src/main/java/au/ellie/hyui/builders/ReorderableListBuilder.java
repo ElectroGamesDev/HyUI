@@ -21,6 +21,7 @@ package au.ellie.hyui.builders;
 import au.ellie.hyui.elements.LayoutModeSupported;
 import au.ellie.hyui.elements.ScrollbarStyleSupported;
 import au.ellie.hyui.elements.UIElements;
+import au.ellie.hyui.types.ScrollbarStyle;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 
@@ -34,6 +35,7 @@ public class ReorderableListBuilder extends UIElementBuilder<ReorderableListBuil
     private String layoutMode;
     private String scrollbarStyleReference;
     private String scrollbarStyleDocument;
+    private ScrollbarStyle scrollbarStyle;
     private HyUIAnchor dropIndicatorAnchor;
     private HyUIPatchStyle dropIndicatorBackground;
 
@@ -62,12 +64,26 @@ public class ReorderableListBuilder extends UIElementBuilder<ReorderableListBuil
     public ReorderableListBuilder withScrollbarStyle(String document, String styleReference) {
         this.scrollbarStyleDocument = document;
         this.scrollbarStyleReference = styleReference;
+        this.scrollbarStyle = null;
+        return this;
+    }
+
+    @Override
+    public ReorderableListBuilder withScrollbarStyle(ScrollbarStyle style) {
+        this.scrollbarStyle = style;
+        this.scrollbarStyleDocument = null;
+        this.scrollbarStyleReference = null;
         return this;
     }
 
     @Override
     public String getScrollbarStyleReference() {
         return scrollbarStyleReference;
+    }
+
+    @Override
+    public ScrollbarStyle getScrollbarStyle() {
+        return scrollbarStyle;
     }
 
     @Override

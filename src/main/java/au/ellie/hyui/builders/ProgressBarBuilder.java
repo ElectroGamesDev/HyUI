@@ -26,6 +26,7 @@ import au.ellie.hyui.elements.UIElements;
 import au.ellie.hyui.theme.Theme;
 import au.ellie.hyui.types.ProgressBarAlignment;
 import au.ellie.hyui.types.ProgressBarDirection;
+import au.ellie.hyui.types.ScrollbarStyle;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import java.util.Set;
@@ -180,13 +181,28 @@ public class ProgressBarBuilder extends UIElementBuilder<ProgressBarBuilder> imp
     }
 
     @Override
+    public ProgressBarBuilder withScrollbarStyle(ScrollbarStyle style) {
+        return this; // Not supported
+    }
+
+    @Override
     public String getScrollbarStyleReference() {
+        return null;
+    }
+
+    @Override
+    public ScrollbarStyle getScrollbarStyle() {
         return null;
     }
 
     @Override
     public String getScrollbarStyleDocument() {
         return null;
+    }
+
+    @Override
+    public boolean supportsScrollbarStyle() {
+        return false;
     }
 
     public ProgressBarBuilder withBar(HyUIPatchStyle bar) {

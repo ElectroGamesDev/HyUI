@@ -19,10 +19,12 @@
 package au.ellie.hyui.builders;
 
 import au.ellie.hyui.HyUIPlugin;
+import au.ellie.hyui.elements.ScrollbarStyleSupported;
 import au.ellie.hyui.elements.UIElements;
 import au.ellie.hyui.events.UIContext;
 import au.ellie.hyui.events.UIEventActions;
 import au.ellie.hyui.types.LayoutMode;
+import au.ellie.hyui.types.ScrollbarStyle;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
@@ -36,8 +38,12 @@ import java.util.function.Consumer;
  * Builder for DynamicPaneContainer UI elements.
  * Children of this MUST be DynamicPane elements.
  */
-public class DynamicPaneContainerBuilder extends UIElementBuilder<DynamicPaneContainerBuilder> {
+public class DynamicPaneContainerBuilder extends UIElementBuilder<DynamicPaneContainerBuilder>
+        implements ScrollbarStyleSupported<DynamicPaneContainerBuilder> {
     private LayoutMode layoutMode;
+    private String scrollbarStyleReference;
+    private String scrollbarStyleDocument;
+    private ScrollbarStyle scrollbarStyle;
 
     public DynamicPaneContainerBuilder() {
         super("DynamicPaneContainer", "#HyUIDynamicPaneContainer");
@@ -91,6 +97,37 @@ public class DynamicPaneContainerBuilder extends UIElementBuilder<DynamicPaneCon
     }
 
     @Override
+    public DynamicPaneContainerBuilder withScrollbarStyle(String document, String styleReference) {
+        this.scrollbarStyleDocument = document;
+        this.scrollbarStyleReference = styleReference;
+        this.scrollbarStyle = null;
+        return this;
+    }
+
+    @Override
+    public DynamicPaneContainerBuilder withScrollbarStyle(ScrollbarStyle style) {
+        this.scrollbarStyle = style;
+        this.scrollbarStyleDocument = null;
+        this.scrollbarStyleReference = null;
+        return this;
+    }
+
+    @Override
+    public String getScrollbarStyleReference() {
+        return scrollbarStyleReference;
+    }
+
+    @Override
+    public ScrollbarStyle getScrollbarStyle() {
+        return scrollbarStyle;
+    }
+
+    @Override
+    public String getScrollbarStyleDocument() {
+        return scrollbarStyleDocument;
+    }
+
+    @Override
     protected boolean supportsStyling() {
         return false;
     }
@@ -109,6 +146,8 @@ public class DynamicPaneContainerBuilder extends UIElementBuilder<DynamicPaneCon
     protected void onBuild(UICommandBuilder commands, UIEventBuilder events) {
         String selector = getSelector();
         if (selector == null) return;
+
+        applyScrollbarStyle(commands, selector);
 
         if (layoutMode != null) {
             HyUIPlugin.getLog().logFinest("Setting LayoutMode: " + layoutMode + " for " + selector);

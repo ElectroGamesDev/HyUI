@@ -19,6 +19,9 @@
 package au.ellie.hyui.elements;
 
 import au.ellie.hyui.HyUIPlugin;
+import au.ellie.hyui.types.ScrollbarStyle;
+import au.ellie.hyui.utils.BsonDocumentHelper;
+import au.ellie.hyui.utils.PropertyBatcher;
 import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 
@@ -47,11 +50,26 @@ public interface ScrollbarStyleSupported<T extends ScrollbarStyleSupported<T>> {
     T withScrollbarStyle(String document, String styleReference);
 
     /**
+     * Sets the scrollbar style directly via a typed ScrollbarStyle.
+     *
+     * @param style The ScrollbarStyle to apply.
+     * @return This builder instance for method chaining.
+     */
+    T withScrollbarStyle(ScrollbarStyle style);
+
+    /**
      * Gets the current scrollbar style reference.
      *
      * @return The reference string, or null if not set.
      */
     String getScrollbarStyleReference();
+
+    /**
+     * Gets the current typed scrollbar style.
+     *
+     * @return The ScrollbarStyle instance, or null if not set.
+     */
+    ScrollbarStyle getScrollbarStyle();
 
     /**
      * Gets the current scrollbar style document.
@@ -61,12 +79,31 @@ public interface ScrollbarStyleSupported<T extends ScrollbarStyleSupported<T>> {
     String getScrollbarStyleDocument();
 
     /**
+     * Whether this element can apply a scrollbar style in its current configuration.
+     *
+     * @return true if scrollbar styling should be applied.
+     */
+    default boolean supportsScrollbarStyle() {
+        return true;
+    }
+
+    /**
      * Default implementation to apply the scrollbar style to the UICommandBuilder.
      * 
      * @param commands The UICommandBuilder to use.
      * @param selector The selector for the element.
      */
     default void applyScrollbarStyle(UICommandBuilder commands, String selector) {
+        if (!supportsScrollbarStyle()) {
+            return;
+        }
+        ScrollbarStyle scrollbarStyle = getScrollbarStyle();
+        if (scrollbarStyle != null && selector != null) {
+            BsonDocumentHelper doc = PropertyBatcher.beginSet();
+            scrollbarStyle.applyTo(doc);
+            PropertyBatcher.endSet(selector + ".ScrollbarStyle", doc, commands);
+            return;
+        }
         String reference = getScrollbarStyleReference();
         String document = getScrollbarStyleDocument();
         if (reference != null && document != null && selector != null) {

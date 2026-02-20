@@ -28,6 +28,7 @@ import au.ellie.hyui.elements.UIElements;
 import au.ellie.hyui.theme.Theme;
 import au.ellie.hyui.types.InputFieldDecorationStyle;
 import au.ellie.hyui.types.InputFieldStyle;
+import au.ellie.hyui.types.ScrollbarStyle;
 import au.ellie.hyui.utils.BsonDocumentHelper;
 import au.ellie.hyui.utils.PropertyBatcher;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
@@ -57,6 +58,7 @@ public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder>
     private String backgroundStyleDocument;
     private String scrollbarStyleReference;
     private String scrollbarStyleDocument;
+    private ScrollbarStyle scrollbarStyle;
     private HyUIPadding contentPadding;
     private InputFieldDecorationStyle decoration;
     private boolean isMultiline;
@@ -329,6 +331,16 @@ public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder>
         if (!isMultiline) return this;
         this.scrollbarStyleDocument = document;
         this.scrollbarStyleReference = styleReference;
+        this.scrollbarStyle = null;
+        return this;
+    }
+
+    @Override
+    public TextFieldBuilder withScrollbarStyle(ScrollbarStyle style) {
+        if (!isMultiline) return this;
+        this.scrollbarStyle = style;
+        this.scrollbarStyleDocument = null;
+        this.scrollbarStyleReference = null;
         return this;
     }
 
@@ -338,8 +350,18 @@ public class TextFieldBuilder extends UIElementBuilder<TextFieldBuilder>
     }
 
     @Override
+    public ScrollbarStyle getScrollbarStyle() {
+        return scrollbarStyle;
+    }
+
+    @Override
     public String getScrollbarStyleDocument() {
         return scrollbarStyleDocument;
+    }
+
+    @Override
+    public boolean supportsScrollbarStyle() {
+        return isMultiline;
     }
 
     /**

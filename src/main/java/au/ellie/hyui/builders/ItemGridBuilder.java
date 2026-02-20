@@ -25,6 +25,7 @@ import au.ellie.hyui.elements.ScrollbarStyleSupported;
 import au.ellie.hyui.elements.UIElements;
 import au.ellie.hyui.events.UIEventActions;
 import au.ellie.hyui.types.ItemGridInfoDisplayMode;
+import au.ellie.hyui.types.ScrollbarStyle;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.ui.ItemGridSlot;
@@ -50,6 +51,7 @@ public class ItemGridBuilder extends UIElementBuilder<ItemGridBuilder> implement
     private HyUIPatchStyle background;
     private String scrollbarStyleReference;
     private String scrollbarStyleDocument;
+    private ScrollbarStyle scrollbarStyle;
     private Boolean renderItemQualityBackground;
     private Boolean areItemsDraggable;
     private Boolean keepScrollPosition;
@@ -110,12 +112,26 @@ public class ItemGridBuilder extends UIElementBuilder<ItemGridBuilder> implement
     public ItemGridBuilder withScrollbarStyle(String document, String styleReference) {
         this.scrollbarStyleDocument = document;
         this.scrollbarStyleReference = styleReference;
+        this.scrollbarStyle = null;
+        return this;
+    }
+
+    @Override
+    public ItemGridBuilder withScrollbarStyle(ScrollbarStyle style) {
+        this.scrollbarStyle = style;
+        this.scrollbarStyleDocument = null;
+        this.scrollbarStyleReference = null;
         return this;
     }
 
     @Override
     public String getScrollbarStyleReference() {
         return this.scrollbarStyleReference;
+    }
+
+    @Override
+    public ScrollbarStyle getScrollbarStyle() {
+        return this.scrollbarStyle;
     }
 
     @Override
